@@ -4,12 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "coverage": "nyc npm run test && xdg-open coverage/index.html",
     "pretest": "eslint **/*.js",
-    "test": "npm run test:proj && npm run test:asse && npm run test:sho && npm run test:exp",
-    "test:proj": "mocha test/*.spec.js",
-    "test:asse": "mocha test/*.assert.js",
-    "test:sho": "mocha test/*.should.js",
-    "test:exp": "mocha test/*.expect.js"
+    "test": "mocha test/*.spec.js"
   },
   "author": "",
   "license": "ISC",
