@@ -1,0 +1,53 @@
+// https://eslint.org/docs/rules/{rule_name}
+{
+	"env": {
+		"browser": true,
+		"commonjs": true,
+		"es2020": true,
+		"mocha": true
+	},
+	"extends": "eslint:recommended",
+	"parserOptions": {
+		"ecmaVersion": 11
+	},
+	"rules": {
+		"prefer-promise-reject-errors": "warn",
+		"max-classes-per-file": ["warn", 1],
+		"grouped-accessor-pairs": "warn",
+		"prefer-regex-literals": "warn",
+		"no-case-declarations": "warn",
+		"default-param-last": "warn",
+		"eqeqeq": ["warn", "smart"],
+		"no-useless-return": "warn",
+		"no-useless-concat": "warn",
+		"no-empty-function": "warn",
+		"no-throw-literal": "warn",
+		"no-return-assign": "warn",
+		"no-multi-spaces": "warn",
+		"no-useless-call": "warn",
+		"no-return-await": "warn",
+		"no-extra-parens": "warn",
+		"no-unused-vars": "warn",
+		"no-lone-blocks": "warn",
+		"default-case": "warn",
+		"dot-notation": "warn",
+		"no-sequences": "warn",
+		"wrap-iife": "warn",
+		"radix": "warn",
+		"no-unused-expressions": ["error", {"allowTernary": true, "allowShortCircuit": true}],
+		"prefer-named-capture-group": "error",
+		"no-prototype-builtins": "error",
+		"array-callback-return": "error",
+		"no-extend-native": "error",
+		"no-new-wrappers": "error",
+		"require-await": "error",
+		"getter-return": "error",
+		"no-var": "error"
+	}
+}
+// awesome rules
+
+/*"no-restricted-properties": [1, {
+	"property": "toString",
+	"message": "This is so akward. Please, use `console.log` instead"
+}],*/

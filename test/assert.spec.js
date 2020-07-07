@@ -1,0 +1,357 @@
+/* eslint-disable max-classes-per-file */
+
+const {assert} = require('chai')
+
+describe('Assert', function () {
+	describe('base', function () {
+		it('this case should be pending')
+		it('`assert` function', function () {
+			const first = 1
+			const second = first + 2
+			assert(first !== second, `${first} should be different from ${second}`)
+		})
+
+		it('`.fail` should  throws and `.throw` should catch it', function () {
+			const message = 'It should throws a failure'
+			assert.throw(function () {throw new Error(message)}, message)
+		})
+	})
+
+	describe('#equal', function () {
+		it('`.equal` should computes only a non-strict equality', function () {
+			assert.equal(1, '1')
+			assert.equal(false, 0)
+			assert.equal(true, 1)
+			assert.equal(undefined, null)
+			/* IT JUST WORKS IN THE .deepEqual
+			const daniel = 'bra'
+			assert.equal({daniel}, {daniel})
+			assert.equal([1,2,3,4,5], [1,2,3,4,5])
+			*/
+		})
+
+		it('`.strictEqual` should computes a strict equality', function () {
+			const daniel = 'brazil'
+			//assert.throw(strictEqual, '`.strictEqual` should throws an error when evalutes `1` and `\'1\'`')
+			//assert.throw(function () {strictEqual({daniel}, {daniel})}, '`.strictEqual` should throws an error when evalutes `1` and `\'1\'`')
+			assert.strictEqual(1, 1)
+			assert.strictEqual(daniel, 'brazil')
+		})
+
+		it('`.deepEqual` should computes an equality by reference', function () {
+			const daniel = 'brazil'
+			assert.deepEqual({daniel}, {'daniel': daniel})
+			assert.deepEqual(daniel, 'brazil')
+			assert.deepEqual(1, 1)
+			assert.deepEqual([1,2,3,4,5], [1,2,3,4,5])
+		})
+
+		it('`.notEqual` should computes only a non-strict difference', function () {
+			assert.notEqual(1, 2)
+			assert.notEqual(true, false)
+			assert.notEqual([], {})
+			assert.notEqual(undefined, NaN)
+		})
+
+		it('`.notStrictEqual` should computes a strict difference', function () {
+			// !==
+			assert.notStrictEqual(undefined, null)
+			assert.notStrictEqual(1, 2)
+			assert.notStrictEqual(1, '1')
+			assert.notStrictEqual(1, true)
+		})
+
+		it('`.notDeepEqual` should computes a deep diference', function () {
+			const daniel = 'brazil'
+			assert.notDeepEqual({daniel}, {daniel: 'daniel'})
+			assert.notDeepEqual(1, '1')
+			assert.notDeepEqual([1,2,3], [1,2,3, 4])
+		})
+	})
+
+	describe('#is* to objects properties', function () {
+		it('`.isOk` should be true for several truly objects', function () {
+			assert.isOk('My string')
+			assert.isOk([], 'I think that `[]` should be ok')
+			assert.isOk(123)
+			assert.isOk({})
+			assert.isOk(() => false)
+		})
+
+		it('`.isNotOk` should be true for falsy values', function () {
+			assert.isNotOk('', 'I guess that an empty string would be truly')
+			assert.isNotOk(undefined)
+			assert.isNotOk(null)
+			assert.isNotOk(NaN)
+			assert.isNotOk(0)
+			assert.isNotOk(false)
+		})
+
+		it('`.isTrue` should works only with true values', function () {
+			assert.isTrue(true)
+			assert.isTrue(!!18)
+		})
+
+		it('`.isNotTrue` should works with any value except true', function () {
+			assert.isNotTrue('brazil')
+			assert.isNotTrue(1)
+			assert.isNotTrue(false)
+			assert.isNotTrue(null)
+		})
+
+		it('`.isFalse` should works only with false values', function () {
+			assert.isFalse(false)
+			assert.isFalse(!!undefined)
+			assert.isFalse(!!0)
+			assert.isFalse(!true)
+		})
+
+		it('`.isNotFalse` should works with any non-false value', function () {
+			assert.isNotFalse(true)
+			assert.isNotFalse(1)
+			assert.isNotFalse(0)
+			assert.isNotFalse(undefined)
+			assert.isNotFalse('')
+			assert.isNotFalse(null)
+		})
+
+		it('`.isNull` should works only with null values', function () {
+			let daniel = null
+			assert.isNull(null)
+			assert.isNull(daniel)
+			// assert.isNull(undefined) // does not work
+			// assert.isNull([]) // does not work
+		})
+
+		it('`.isNotNull` should works with any not null values', function () {
+			let daniel
+			assert.isNotNull(!null)
+			assert.isNotNull(0)
+			assert.isNotNull(daniel)	// in really, it is undefined
+			// eslint-disable-next-line no-empty-function
+			assert.isNotNull((function () {})())	// it is undefined, too
+		})
+
+		it('`.isNaN` should works only with NaN', function () {
+			assert.isNaN(0/0)
+			assert.isNaN(Infinity/Infinity)
+			assert.isNaN(Infinity-Infinity)
+			assert.isNaN(undefined/23)
+			assert.isNaN('brazil'/3)
+		})
+
+		it('`.isNotNaN` should works with any non-nan values', function () {
+			assert.isNotNaN(0/3)
+			assert.isNotNaN(Infinity/7)
+			assert.isNotNaN(undefined)
+			assert.isNotNaN('brazil')
+		})
+
+		it('`.exists` should works with non `null` or `undefined` values', function () {
+			const v = null
+			assert.exists(undefined + 3)
+			assert.exists(!v)
+			assert.exists('')
+		})
+
+		it('`.notExists` should works only with `null` or `undefined` values', function () {
+			let b
+			const c = 'brazil'
+			assert.notExists(b)
+			assert.notExists(c.err)
+		})
+
+		it('`.isUndefined` should works only with `undefined` values', function () {
+			let b = 'brazil'
+			assert.isUndefined(b.value)
+			assert.isUndefined(undefined)
+			// eslint-disable-next-line no-empty-function
+			assert.isUndefined((function () {})())
+			assert.isUndefined()
+		})
+
+		it('`.isDefined` should works with any non-undefined value', function () {
+			assert.isDefined(false)
+			assert.isDefined(assert)
+			assert.isDefined(null)
+		})
+	})
+
+	describe('#is* to object types', function () {
+		it('`.isFunction` should works only with functions', function () {
+			const b = () => b	// trolll
+			// eslint-disable-next-line no-empty-function
+			assert.isFunction(function () {})
+			assert.isFunction(() => 3)
+			assert.isFunction(assert.isFunction)			// trolll again
+			assert.isFunction(require('chai').should) // the great question of humanity
+			assert.isFunction(require('chai').assert)	// it is also a function and an object
+			assert.isFunction(b)
+		})
+
+		it('`.isNotFunction` should works with non-function', function () {
+			const b = function () {return 12}
+			assert.isNotFunction((() => 23)())
+			assert.isNotFunction(b())
+			assert.isNotFunction(false)
+		})
+
+		it('`.isObject` should works only with `Object`s like', function () {
+			class MyErr {constructor(){}}	// eslint-disable-line no-empty-function
+			assert.isObject(new MyErr())
+			assert.isObject({'0':'b','1':'r','2':'a','3':'z','4':'i','5':'l'})
+			assert.isObject({'d': 2})
+		})
+
+		it('`.isNotObject` should works only with non `Object`s like', function () {
+			assert.isNotObject(12)
+			assert.isNotObject('brazil')
+			assert.isNotObject(true)
+			assert.isNotObject(null)
+			assert.isNotObject([1,2,3])
+			assert.isNotObject(new Array(3))
+			assert.isNotObject(new Array(1,2,3))
+			/* eslint-disable no-new-wrappers*/
+			assert.isNotObject(new String('this still is not an object'))
+			assert.isNotObject(new Boolean([]))
+			assert.isNotObject(new Error('This is an object, bro'))
+			/* eslint-enable no-new-wrappers*/
+		})
+
+		it('`.isArray` should works only with arrays', function () {
+			const f = (...values) => values
+			assert.isArray([])
+			assert.isArray([1,2,3])
+			assert.isArray(f(1,2,3))
+			assert.isArray(new Array(1,2,3,4,5))
+		})
+
+		it('`.isNotArray` should works only with non array values', function () {
+			const f = () => arguments
+			assert.isNotArray(f(1,2,3))
+			assert.isNotArray()
+			assert.isNotArray('string')
+		})
+
+		it('`.isString` should works only with string values', function () {
+			assert.isString(new String(false))	// eslint-disable-line
+			assert.isString('1')
+			assert.isString(typeof undefined)
+			assert.isString('brazil'.charAt(1))
+		})
+
+		it('`.isNotString` should work with non string values', function () {
+			assert.isNotString(('daniel', [1,2,3]))
+		})
+
+		it('`.isNumber` should works only with number values', function () {
+			assert.isNumber(123)
+			assert.isNumber(-0)
+			assert.isNumber(0.82)
+			assert.isNumber(Infinity)
+			assert.isNumber(NaN)	// i have no idea
+			assert.isNumber(072)	// eslint-disable-line
+			assert.isNumber(new Number('1'))	// eslint-disable-line
+			assert.isNumber(new Number('072'))	// eslint-disable-line
+			assert.isNumber(parseInt('100', 2))
+			assert.isNumber(parseFloat('12342.234234'))
+		})
+
+		it('`.isNotNumber` should works only with non number values', function () {
+			assert.isNotNumber('123')
+			// assert.isNotNumber(NaN) // it does not work
+			assert.isNotNumber(false)
+		})
+
+		it('`.isBoolean` should works only with boolean values', function () {
+			assert.isBoolean(true)
+			assert.isBoolean(!1)
+			assert.isBoolean(!!0)
+			assert.isBoolean(new Boolean('brazil'))	// eslint-disable-line
+		})
+
+		it('`.isNotBoolean` should works with any value except boolean', function () {
+			assert.isNotBoolean('brazil')
+			assert.isNotBoolean(undefined)
+			assert.isNotBoolean(0)
+		})
+	})
+
+	describe('#is* to numbers', function () {
+		it('`.isAbove` should calculates a value greater than other', function () {
+			const throwMessage = '`.isAbove` should throws an error when the first value is smaller or equal than the second'
+			assert.throws(function () {assert.isAbove(1, 1, throwMessage)}, throwMessage)
+
+			assert.isAbove(2, 1)
+			assert.isAbove(0, -0.999999)
+		})
+
+		it('`.isAtLeast` should calculates an inclusive floor', function () {
+			const throwMessage = '`.isAtLeast` should thrown an error when the first is less than the second'
+			assert.throw(function () {assert.isAtLeast(1, 1.0000001, throwMessage)}, throwMessage)
+
+			assert.isAtLeast(1, 1)
+			assert.isAtLeast(2, 1)
+		})
+
+		it('`.isBelow` should calculates a ceil', function () {
+			const throwMessage = '`.isBelow` should thrown an error when the first is greater or major than second'
+			assert.throw(function () {assert.isBelow(1, 1, throwMessage)}, throwMessage)
+
+			assert.isBelow(1, 2)
+			assert.isBelow(1, 1.00000001)
+		})
+
+		it('`.isAtMost` should calculates an inclusive ceil', function () {
+			assert.isAtMost(12, 28)
+			assert.isAtMost(12, 12)
+			assert.isAtMost(12, 12.000000001)
+		})
+
+		it('`.isFinite` should works with numeric valuable', function () {
+			const googol = 10 ^ 100
+			const googolplex = 10 ^ googol
+			assert.isFinite(1)
+			assert.isFinite(googol)
+			assert.isFinite(googolplex)
+		})
+	})
+
+	describe('Utils operations', function () {
+		it('`.typeOf` should return the typeof based in the `Object.prototype.toString`', function () {
+			assert.typeOf('brazil', 'string')
+			assert.typeOf(1, 'number')
+			assert.typeOf(NaN, 'number')
+			assert.typeOf(Infinity, 'number')
+			assert.typeOf(true, 'boolean')
+			assert.typeOf([1,2,3], 'array')
+			assert.typeOf({dan: 'brazil'}, 'object')
+			assert.typeOf(null, 'null')
+			assert.typeOf(undefined, 'undefined')
+			assert.typeOf(/[ab]/, 'regexp')
+		})
+
+		it('`.notTypeOf` should evaluate a non type based in the `Object.prototype.toString`', function () {
+			assert.notTypeOf('brazil', 'number')
+			assert.notTypeOf(null, 'undefined')
+			assert.notTypeOf([1,2,3], 'object')
+		})
+
+		it('`.instanceOf` should verify the constructor instance', function () {
+			class Ventu extends Error {constructor() {super()}}
+			assert.instanceOf(new Ventu(), Error)
+			assert.instanceOf(new String('brazil'), Object)	// eslint-disable-line
+			// assert.instanceOf('brazil', String)	// it does not work
+			assert.instanceOf(new Number(Infinity), Number)	// eslint-disable-line
+			assert.instanceOf(new Number(23), Number)	// eslint-disable-line
+		})
+
+		it('`.notInstanceOf` should verify with others constructor instance', function () {
+			assert.notInstanceOf('brazil', String)
+			assert.notInstanceOf('brazil', Object)
+			assert.notInstanceOf(12, Number)
+			assert.notInstanceOf(12, Object)
+			assert.notInstanceOf(true, Boolean)
+		})
+	})
+})
