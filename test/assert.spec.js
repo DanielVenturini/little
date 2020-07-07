@@ -318,7 +318,7 @@ describe('Assert', function () {
 	})
 
 	describe('Utils operations', function () {
-		it('`.typeOf` should return the typeof based in the `Object.prototype.toString`', function () {
+		it('`.typeOf` should returns the typeof based in the `Object.prototype.toString`', function () {
 			assert.typeOf('brazil', 'string')
 			assert.typeOf(1, 'number')
 			assert.typeOf(NaN, 'number')
@@ -331,13 +331,13 @@ describe('Assert', function () {
 			assert.typeOf(/[ab]/, 'regexp')
 		})
 
-		it('`.notTypeOf` should evaluate a non type based in the `Object.prototype.toString`', function () {
+		it('`.notTypeOf` should evaluates a non type based in the `Object.prototype.toString`', function () {
 			assert.notTypeOf('brazil', 'number')
 			assert.notTypeOf(null, 'undefined')
 			assert.notTypeOf([1,2,3], 'object')
 		})
 
-		it('`.instanceOf` should verify the constructor instance', function () {
+		it('`.instanceOf` should verifies the constructor instance', function () {
 			class Ventu extends Error {constructor() {super()}}
 			assert.instanceOf(new Ventu(), Error)
 			assert.instanceOf(new String('brazil'), Object)	// eslint-disable-line
@@ -346,12 +346,91 @@ describe('Assert', function () {
 			assert.instanceOf(new Number(23), Number)	// eslint-disable-line
 		})
 
-		it('`.notInstanceOf` should verify with others constructor instance', function () {
+		it('`.notInstanceOf` should verifies with others constructor instance', function () {
 			assert.notInstanceOf('brazil', String)
 			assert.notInstanceOf('brazil', Object)
 			assert.notInstanceOf(12, Number)
 			assert.notInstanceOf(12, Object)
 			assert.notInstanceOf(true, Boolean)
+		})
+
+		it('`.include` should verifies the values inside an object', function () {
+			const l = [1,2,3, {a: 12}]
+			const str = 'brazil'
+			const obj = {prop1: 'val1', prop2: 'val2'}
+			assert.include(l, 3)
+			assert.include(str, 'bra')
+			assert.include(obj, {'prop1': 'val1'})
+			assert.include(obj, {toString: obj.toString})
+		})
+
+		it('`.notInclude` should verifies if the values are not in the object', function () {
+			const l = [1,2,3, {a: 12}]
+			const str = 'brazil'
+			const obj = {prop1: 'val1', prop2: 'val2', l: l[3]}
+			assert.notInclude(l, [1,2,3])
+			assert.notInclude(str, 'liz')
+			assert.notInclude(obj, {pro1: 'val2'})
+			assert.notInclude(l, {a: 12})
+			assert.notInclude(obj, {l: {a: 12}})
+		})
+
+		it('`.deepInclude` should verifies deeply the values inside an object', function () {
+			const l = [1,2,3, {b: 2}]
+			const obj = {prop1: 'val1', prop2: 'val2'}
+			assert.deepInclude(l, {b: 2})
+			assert.deepInclude(obj, {prop1: 'val1'})
+		})
+
+		it('`.notDeepInclude` should verifies if the values are not in the object', function () {
+			const l = [1,2,3, {b: 2}]
+			const obj = {prop1: 'val1', prop2: 'val2', l: l[3]}
+			assert.notDeepInclude(l, [2, {b: 2}])
+			assert.notDeepInclude(obj, {l: {b: 12}})
+		})
+
+		it('`.nestedInclude` should verifies the nested property of an object', function () {
+			// properties with `.` or `[]` can be escaped using double backslashes `\\`
+			const obj = {countries: {name: 'brazil', population: 1024}, '.bin': {mocha: 'mocha', '[nyc': '.nyc'}}
+			assert.nestedInclude(obj, {'countries.name': 'brazil'})
+			assert.nestedInclude(obj, {'\\.bin.\\[nyc': '.nyc'})
+		})
+
+		it('`.notNestedInclude` should verifies nested if the values are not in the object', function () {
+			const obj = {c: {'.bin': {false: [1,2,3], true: [1,2,3], 'back]': 12}}}
+			assert.notNestedInclude(obj, {'c.\\.bin.back\\]': 122})
+		})
+
+		it('`.deepNestedInclude` should verifies nested deeply if the values are on object', function () {
+			const obj = {c: {'.bin': {false: [1,2,3], true: [1,2,3], 'back]': {a: 12}}}}
+			assert.deepNestedInclude(obj, {'c.\\.bin.false': [1,2,3]})
+			assert.deepNestedInclude(obj, {'c.\\.bin.back\\]': {a: 12}})
+		})
+
+		it('`.notDeepNestedInclude` should verifies nested deeply if the values are not in the object', function () {
+			const obj = {c: {'.bin': {false: [1,2,3], true: [1,2,3], 'back]': {a: 12}}}}
+			assert.notDeepNestedInclude(obj, {'c.\\.bin.back\\]': {a: 13}})
+		})
+
+		it('`.ownInclude` should verifies values in object but ignores inherited', function () {
+			const obj = {c: {'.bin': {false: [1,2,3], true: 123, 'back]': {a: 12}}}}
+			assert.ownInclude(obj.c['.bin'], {true: 123})
+		})
+
+		it('`.notOwnInclude` should verifies values that are not in an object or is inherited', function () {
+			const obj = {c: {'.bin': {false: [1,2,3], true: 123, 'back]': {a: 12}}}}
+			assert.notOwnInclude(obj, {toString: obj.toString})	// obj contains `toString`, but it is inherited
+			assert.notOwnInclude(obj, {c: {'.bin': {true: 123}}})	// keys `false` and `back]` are missing, thus are not own included
+		})
+
+		it('`.deepOwnInclude` should verifies deeply the values that are in object', function () {
+			const obj = {c: {'.bin': {false: [1,2,3], true: 123, 'back]': {a: 12}}}}
+			assert.deepOwnInclude(obj.c, {'.bin': {false: [1,2,3], true:123, 'back]': {a: 12}}})
+		})
+
+		it('`.notDeepOwnInclude` should verifies deeply the properties that are not in an object', function () {
+			const obj = {c: {'.bin': {false: [1,2,3], true: 123, 'back]': {a: 12}}}}
+			assert.notDeepOwnInclude(obj.c['.bin'], {false: [1,2,3,4]})
 		})
 	})
 })
