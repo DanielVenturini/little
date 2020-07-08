@@ -22,11 +22,11 @@ function createValidDbFile() {
  * If not, the `fs.unlinkSync` should throws an `ENOENT`
  * 
  */
-function deletedbpath () {
+function deletedbpath (path = dbpath) {
 	try{
-		fs.unlinkSync(dbpath)
+		fs.unlinkSync(path)
 	} catch(err) {
-		assert.throw(function () {throw err}, `ENOENT: no such file or directory, unlink '${dbpath}'`)
+		assert.throw(function () {throw err}, `ENOENT: no such file or directory, unlink '${path}'`)
 	}
 }
 

@@ -10,8 +10,7 @@ class Little {
 	 * @param {string} db OPTIONAL the database you want to connect. Also, you can use later `.use('db')`.
 	 * @param {string} dbpath OPTIONAL the path to DBVALUES.json, if you want a other path. (`./DBVALUES.json` default)
 	 */
-	constructor (db, dbpath = './DBVALUES.json') {
-		this.db = db
+	constructor (dbpath = './DBVALUES.json') {
 		this.dbpath = dbpath
 		this.DBVALUE = this._openDB()
 	}
@@ -96,12 +95,31 @@ class Little {
 	_dbExists () {
 		return Object.keys(this.DBVALUE).includes(this.db)
 	}
-	
-	// eslint-disable-next-line no-unused-vars
-	_isThereCollections (collection) {
+
+	/**
+	 * Verifies if collection `collection` exists in `DBVALUE`.`db`
+	 * @param {string} collection 
+	 * @returns {boolean} indicates if the `db`.`collection` exists
+	 */
+	_collectionExists (collection) {
+		return this._dbExists() ? !!this.DBVALUE[this.db][collection] : false
+	}
+
+	_isThereCollections () {
 		if (!this._isThereDbs()) return false
 		if (!this._dbExists()) return false
-		return !!Object.keys(this.DBVALUE[this.db][collection] || {}).length
+		return !!Object.keys(this.DBVALUE[this.db]).length
+	}
+
+	/**
+	 * Creates a new collection. This method must be called only from Collection.insert(), where there is warranty that there is no the `collection`.
+	 * @param {string} collection The collection that will be create at `DBVALUES`.`db`
+	 */
+	_createCollection (collection) {
+		const newCollection = {[collection]: []}
+		// if `db` already exists, it migth contains others collections. Then, join those with `newCollection`
+		if (this._dbExists()) this.DBVALUE[this.db] = Object.assign(this.DBVALUE[this.db], newCollection)
+		else this.DBVALUE[this.db] = newCollection
 	}
 
 	/**
@@ -112,6 +130,15 @@ class Little {
 	_getDBs () {
 		if (!this._isThereDbs()) return []
 		else return Object.keys(this.DBVALUE)
+	}
+
+	/**
+	 * Gets all collection in the used `db`
+	 * @returns string
+	 */
+	_getCollections () {
+		if (!this._isThereCollections()) return []
+		return Object.keys(this.DBVALUE[this.db])
 	}
 
 	/**
@@ -136,12 +163,13 @@ class Little {
 	 * @returns string (ret=true)
 	 */
 	show_collections (ret=false) {
-		if (!this._isThereCollections()) return ret ? '' : undefined
+		let coll = this._getCollections()
 
-		let coll = Object.keys(this.DBVALUE[this.db])
+		if (!coll.length) return ret ? '' : console.log('')
+
 		coll = coll.reduce((prev, curr) => prev + '\n' + curr)
-		if (ret) return coll
-		else console.log(coll)
+
+		return ret ? coll : console.log(coll)
 	}
 
 	/**
@@ -151,7 +179,7 @@ class Little {
 	 */
 	collection (collection) {
 		if (!this._validName(this.db) || !this._validName(collection)) return undefined
-		return new Collection(this.db, collection, this.DBVALUE)
+		return new Collection(collection, this)
 	}
 
 	/**

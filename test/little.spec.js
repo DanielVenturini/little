@@ -1,5 +1,3 @@
-/* global db*/
-
 const fs = require('fs')
 const {assert} = require('chai')
 const Little = require('../little')
@@ -19,7 +17,6 @@ function createTestFile () {
 			file.write('{"a":10,"b":[1,2,3],"c":"brazil"}')
 			file.close()
 			resolve()
-		// }).on('end', function () {
 		})
 	})
 }
@@ -28,7 +25,7 @@ describe('Little specification', function () {
 	before(function () {
 		deletedbpath()
 		createTestFile()
-		db = new Little(null, dbpath)	// eslint-disable-line
+		db = new Little(dbpath)	// eslint-disable-line
 	})
 
 	describe('private interfaces', function () {
@@ -95,12 +92,33 @@ describe('Little specification', function () {
 			assert.isTrue(db._dbExists.call({db: 'dbtest', DBVALUE}))
 		})
 
-		it('`._isThereCollections` should verifies if `collections` exists in `db`', function () {
+		it('`._collectionExists` should verifies corectly if `collections` exists in `db`', function () {
+			const DBVALUE = {db: {coll: 123}}
+			assert.isFalse(db._collectionExists.call(Object.assign(db, {db: 'db', DBVALUE}), ''), '`db` exists but `collection` not')
+			assert.isFalse(db._collectionExists.call(Object.assign(db, {db: 'dbnotexists', DBVALUE}), ''), '`db` does not exist and `collection` does not mean')
+			assert.isTrue(db._collectionExists.call(Object.assign(db, {db: 'db', DBVALUE}), 'coll'), '`db` exists and `collection` too')
+		})
+
+		it('`._createCollection` should create a new collection', function () {
+			const DBVALUE = {db: {coll: 123}}
+
+			db._createCollection.call(Object.assign(db, {db: 'db', DBVALUE}), 'coll1')
+			assert.deepNestedInclude(db.DBVALUE, {'db.coll1': []}, 'db exists and collection not')
+
+			DBVALUE.db.coll1 = []
+			db._createCollection.call(Object.assign(db, {db: 'db', DBVALUE}), 'coll2')
+			assert.deepNestedInclude(db.DBVALUE, {'db.coll1': []}, 'db exists and there is collection there')
+			assert.deepNestedInclude(db.DBVALUE, {'db.coll2': []}, 'db exists and there is collection there')
+
+			db._createCollection.call(Object.assign(db, {db: 'dbnotexists', DBVALUE}), 'coll1')
+			assert.deepNestedInclude(db.DBVALUE, {'dbnotexists.coll1': []}, 'should creates a db and a collection')
+		})
+
+		it('`._isThereCollections` should verifies if there is any collections in `db`', function () {
 			const DBVALUE = {'dbtest': {'collection1': [123]}}
-			assert.isFalse(db._isThereCollections.call(Object.assign(db, {db: 'dbtest', DBVALUE: {}})))	// there is not database
-			assert.isFalse(db._isThereCollections.call(Object.assign(db, {db: 'dbnotexists', DBVALUE})))// database does not exist
-			assert.isFalse(db._isThereCollections.call(Object.assign(db, {db: 'dbtest', DBVALUE}), 'collection2'))// database exists, but collecions not
-			assert.isTrue(db._isThereCollections.call(Object.assign(db, {db: 'dbtest', DBVALUE}), 'collection1'))
+			assert.isFalse(db._isThereCollections.call(Object.assign(db, {db: 'dbtest', DBVALUE: {}})), 'there is not database')
+			assert.isFalse(db._isThereCollections.call(Object.assign(db, {db: 'dbnotexists', DBVALUE})), 'database does not exist')
+			assert.isTrue(db._isThereCollections.call(Object.assign(db, {db: 'dbtest', DBVALUE})))
 		})
 
 		it('`._getDBs` should returns a list of databases', function () {
@@ -146,6 +164,8 @@ describe('Little specification', function () {
 				assert.throw(function () {db._openDB.call(changedThis)}, 'Unexpected end of JSON input')
 			})
 		})
+
+		after(function () {deletedbpath(dbpathtestopen)})
 	})
 
 	describe('create the DBVALUE', function () {
@@ -170,7 +190,7 @@ describe('Little specification', function () {
 			deletedbpath()
 			createValidDbFile()
 			.then(function () {
-				db = new Little(null, dbpath)	// creates a new instance
+				db = new Little(dbpath)	// creates a new instance
 			})
 		})
 
@@ -197,6 +217,14 @@ describe('Little specification', function () {
 
 			assert.notExists(resp1)
 			assert.equal(resp2, 'names\nperson\nage')
+			assert.equal(db.show_dbs.call(Object.assign(db, {DBVALUE: {dbunique: ''}}), true), 'dbunique', 'when there is only one db')
+		})
+
+		it('`.show_collections` should prints something or returns a string', function () {
+			assert.notExists(db.show_collections())
+			assert.equal(db.show_collections(true), '')
+			assert.equal(db.show_collections.call(Object.assign(db, {db: 'names', DBVALUE: {names: {col1: [1]}}}), true), 'col1')
+			assert.equal(db.show_collections.call(Object.assign(db, {db: 'names', DBVALUE: {names: {col1:[1],col2:[1]}}}), true), 'col1\ncol2')
 		})
 
 		it('`.collection` should return undefined when the `db` is not setted', function () {
@@ -211,5 +239,10 @@ describe('Little specification', function () {
 			assert.instanceOf(db.collection('collectionnotexists'), Collection)
 			assert.instanceOf(db.collection('city'), Collection)
 		})
+	})
+
+	after(function () {
+		deletedbpath()
+		deletedbpath(dbpathtestopen)
 	})
 })
