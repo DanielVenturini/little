@@ -90,36 +90,17 @@ class Little {
 	
 	/**
 	 * Verifies if database `db` exists in `DBVALUE`
+	 * @param {string} db It should be changes only by Collection object. Do not use this param.
 	 * @returns boolean
 	 */
-	_dbExists () {
-		return Object.keys(this.DBVALUE).includes(this.db)
-	}
-
-	/**
-	 * Verifies if collection `collection` exists in `DBVALUE`.`db`
-	 * @param {string} collection 
-	 * @returns {boolean} indicates if the `db`.`collection` exists
-	 */
-	_collectionExists (collection) {
-		return this._dbExists() ? !!this.DBVALUE[this.db][collection] : false
+	_dbExists (db = this.db) {
+		return Object.keys(this.DBVALUE).includes(db)
 	}
 
 	_isThereCollections () {
 		if (!this._isThereDbs()) return false
 		if (!this._dbExists()) return false
 		return !!Object.keys(this.DBVALUE[this.db]).length
-	}
-
-	/**
-	 * Creates a new collection. This method must be called only from Collection.insert(), where there is warranty that there is no the `collection`.
-	 * @param {string} collection The collection that will be create at `DBVALUES`.`db`
-	 */
-	_createCollection (collection) {
-		const newCollection = {[collection]: []}
-		// if `db` already exists, it migth contains others collections. Then, join those with `newCollection`
-		if (this._dbExists()) this.DBVALUE[this.db] = Object.assign(this.DBVALUE[this.db], newCollection)
-		else this.DBVALUE[this.db] = newCollection
 	}
 
 	/**
@@ -191,7 +172,7 @@ class Little {
 		if (name === undefined || name === null || name === '') return false
 		return !!/^[a-zA-Z][\w._]*$/.exec(name)
 	}
-
+	
 	/**
 	 * Changes the default database that you are manipulating. It the database does not exists, then it will be created when one document will be inserted in its new collection, that will be created, too.
 	 * @param {string} db The database name. It must starts with a word followed by word, underline `_`, number or dot `.`

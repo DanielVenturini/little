@@ -92,28 +92,6 @@ describe('Little specification', function () {
 			assert.isTrue(db._dbExists.call({db: 'dbtest', DBVALUE}))
 		})
 
-		it('`._collectionExists` should verifies corectly if `collections` exists in `db`', function () {
-			const DBVALUE = {db: {coll: 123}}
-			assert.isFalse(db._collectionExists.call(Object.assign(db, {db: 'db', DBVALUE}), ''), '`db` exists but `collection` not')
-			assert.isFalse(db._collectionExists.call(Object.assign(db, {db: 'dbnotexists', DBVALUE}), ''), '`db` does not exist and `collection` does not mean')
-			assert.isTrue(db._collectionExists.call(Object.assign(db, {db: 'db', DBVALUE}), 'coll'), '`db` exists and `collection` too')
-		})
-
-		it('`._createCollection` should create a new collection', function () {
-			const DBVALUE = {db: {coll: 123}}
-
-			db._createCollection.call(Object.assign(db, {db: 'db', DBVALUE}), 'coll1')
-			assert.deepNestedInclude(db.DBVALUE, {'db.coll1': []}, 'db exists and collection not')
-
-			DBVALUE.db.coll1 = []
-			db._createCollection.call(Object.assign(db, {db: 'db', DBVALUE}), 'coll2')
-			assert.deepNestedInclude(db.DBVALUE, {'db.coll1': []}, 'db exists and there is collection there')
-			assert.deepNestedInclude(db.DBVALUE, {'db.coll2': []}, 'db exists and there is collection there')
-
-			db._createCollection.call(Object.assign(db, {db: 'dbnotexists', DBVALUE}), 'coll1')
-			assert.deepNestedInclude(db.DBVALUE, {'dbnotexists.coll1': []}, 'should creates a db and a collection')
-		})
-
 		it('`._isThereCollections` should verifies if there is any collections in `db`', function () {
 			const DBVALUE = {'dbtest': {'collection1': [123]}}
 			assert.isFalse(db._isThereCollections.call(Object.assign(db, {db: 'dbtest', DBVALUE: {}})), 'there is not database')
