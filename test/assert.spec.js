@@ -355,6 +355,7 @@ describe('Assert', function () {
 		})
 
 		it('`.include` should verifies the values inside an object', function () {
+			// it is different from `.property` because it works with string and list
 			const l = [1,2,3, {a: 12}]
 			const str = 'brazil'
 			const obj = {prop1: 'val1', prop2: 'val2'}
@@ -431,6 +432,86 @@ describe('Assert', function () {
 		it('`.notDeepOwnInclude` should verifies deeply the properties that are not in an object', function () {
 			const obj = {c: {'.bin': {false: [1,2,3], true: 123, 'back]': {a: 12}}}}
 			assert.notDeepOwnInclude(obj.c['.bin'], {false: [1,2,3,4]})
+		})
+
+		it('`.match` should match a `regexp`', function () {
+			assert.match('foobar', /^foo/)
+			assert.match('foobar', /bar$/)
+			assert.match('as12Kdfjl_las.j', /^[a-zA-Z][\w._]*$/)
+		})
+
+		it('`.notMatch` should not match a `regexp`', function () {
+			assert.notMatch('12daniel_ventu.rni', /^[a-zA-Z][\w._]*$/)
+		})
+
+		it('`.property` should verifies a direct or inherited property', function () {
+			// it is different from `.includes` because it just works with properties
+			const obj = {tea: {chai: true}}
+			assert.property(obj, 'tea')
+			assert.property(obj, 'toString')
+			assert.include(obj, {toString: obj.toString})	// the same, i think
+		})
+
+		it('`.notProperty` should verifies if a property is not in the obj', function () {
+			const obj = {tea: {chai: true}}
+			const l = [1,2,3, 'obj']
+			assert.notProperty(obj, 'brazil')
+			assert.notProperty(l, 'obj')	// `.includes` works with list
+		})
+
+		it('`.propertyVal` should verifies the property values', function () {
+			const obj = {tea: {chai: true}, str: 'str', n: 123}
+			assert.propertyVal(obj, 'str', 'str')
+			assert.propertyVal(obj, 'n', 123)
+		})
+
+		it('`.notPropertyVal` should verifies if the value of a property is not a specified value', function () {
+			const obj = {tea: {chai: true}, str: 'str', n: 123}
+			assert.notPropertyVal(obj.tea, 'chai', false)
+			assert.notPropertyVal(obj, 'n', undefined)
+		})
+
+		it('`.deepPropertyVal` should verifies deeply the property values', function () {
+			const obj = {tea: {chai: true}, str: 'str', n: 123}
+			assert.deepPropertyVal(obj, 'tea', {chai: true})
+		})
+
+		it('`.noDeepPropertyVal` should verifies deeply if the value of a properfy is not a specified value', function () {
+			const obj = {tea: {chai: true}, str: 'str', n: 123}
+			assert.notDeepPropertyVal(obj, 'tea', {chai: false})
+		})
+
+		it('`.nestedProperty` should verifies nested if an object has a property', function () {
+			const obj = {tea: {chai: true}, str: 'str', n: 123}
+			assert.nestedProperty(obj, 'tea.chai')
+			assert.nestedProperty(obj, 'n')
+		})
+
+		it('`.notNestedProperty` should verifies nested if an object has no a specified property', function () {
+			assert.notNestedProperty({a: {b: {c: {d: 1}}}}, 'a.b.c.d.e')
+		})
+
+		it('`.nestedPropertyVal` should verifies nested if an object has a specified property', function () {
+			const obj = {tea: {chai: true}, str: 'str', n: 123}
+			assert.nestedPropertyVal({a: {b: {c: {d: 1}}}}, 'a.b.c.d', 1)
+			assert.nestedPropertyVal(obj, 'tea.chai', true)
+			assert.nestedPropertyVal(obj, 'str[0]', 's')
+		})
+
+		it('`.notNestedPropertyVal` should verifies nested if a property has no a specified val', function () {
+			const obj = {tea: {chai: true}, str: 'str', n: 123}
+			assert.notNestedPropertyVal(obj, 'str[0]', 'g')
+			assert.notNestedPropertyVal(obj, 'tea.chai', false)
+		})
+
+		it('`deepNestedPropertyVal` should verifies deeply nested if a property has a val', function () {
+			const obj = {tea: {chai: true}, str: 'str', n: 123}
+			assert.deepNestedPropertyVal(obj, 'tea', {chai: true})
+		})
+
+		it('`.notDeepNestedPropertyVal` should verifies if a property has no a specified value', function () {
+			const obj = {tea: {chai: true}, str: 'str', n: 123}
+			assert.notDeepNestedPropertyVal(obj, 'n', '123')
 		})
 	})
 })
