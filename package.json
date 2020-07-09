@@ -4,9 +4,16 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "coverage": "nyc npm run test && xdg-open coverage/index.html",
+    "coverage": "nyc npm run test:coverage && npm run coverage:open",
+    "coverage:open": "xdg-open /tmp/istanbul/coverage/index.html",
     "pretest": "eslint **/*.js",
-    "test": "mocha test/*.spec.js"
+    "test": "mocha test/*.spec.js",
+    "test:assert": "mocha test/assert.spec.js",
+    "test:expect": "mocha test/expect.spec.js",
+    "test:coverage": "nyc --silent npm run test:app && nyc --silent --no-clean npm run test:little && nyc --silent --no-clean npm run test:collection",
+    "test:app": "mocha test/app.spec.js",
+    "test:little": "mocha test/little.spec.js",
+    "test:collection": "mocha test/collection.spec.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,5 +23,8 @@
     "mocha": "^8.0.1",
     "nyc": "^15.1.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "deep-equal": "^2.0.3",
+    "lodash": "^4.17.19"
+  }
 }

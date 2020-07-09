@@ -1,5 +1,22 @@
 {
 	"reporter": "html",
-	"temp-dir": "/tmp/.nyc_output",
-	"exclude": ["test/*.spec.js", "test/common.js"]
+	"temp-dir": "/tmp/istanbul/.nyc_output",
+	"report-dir": "/tmp/istanbul/coverage",
+	"cache-dir": "/tmp/istanbul/.cache/nyc",
+	"exclude": ["test/*.spec.js", "test/common.js"],
+	"ignore-class-method": ["next"],
+
+	"check-coverage": "false",
+	"per-file": "false",
+	"branches": 90,
+	"functions": 60,
+	"lines": 50,
+	"statements": 80,
+
+	"watermarks": {
+		"branches": [75, 90],
+		"functions": [75, 90],
+		"lines": [75, 90],
+		"statements": [75, 90]
+	}
 }
