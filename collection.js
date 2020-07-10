@@ -1,3 +1,6 @@
+const deepEql = require('deep-equal')
+const type = require('type-detect')
+
 class Collection {
 
 	/**
@@ -63,27 +66,57 @@ class Collection {
 	}
 
 	/**
-	 * 
-	 * @param {*} query 
-	 * @param {*} document 
+	 * Returns the value if it was wrapped
+	 * @param {any} value The binding that wrappes the value
+	 * @example .wrappedValue (new String('brazil')) -> 'brazil'
+	 * @returns {any} value wrapped or the object
 	 */
-	_match (query, document) {
-		if (query === document) return true // for numbers, string and hole object comparations
+	_wrappedValue (value) {
+		return value instanceof Number ||
+						value instanceof String ||
+						value instanceof Boolean ? value.valueOf() : value
+	}
+
+	/**
+	 * Verify if the query and document match
+	 *  
+	 * @param {any} query The query to search
+	 * @param {any} document The document to match
+	 * @param {boolean} strictList (default:false) If there are list comparations, query:[1] document:[1,2,3] will be equal, because query[0] === document[0]. If you do not want this comparation, set this param to true.
+	 * @example ._match({a:10}, {a:10, b:20}) -> true
+	 * @return {boolean}
+	 */
+	_match (query, document, strictList = false) {
+		query = this._wrappedValue(query)
+		document = this._wrappedValue(document)
+
+		if (typeof query !== typeof document) return false
+		if (deepEql(query, document)) return true	// for strict values comparations
+		if (typeof query !== 'object' || type(query) === 'RegExp') return false
+
+		// comparation with list should be strict
+		if (strictList && query instanceof Array)
+			if (!(document instanceof Array) || query.length !== document.length) return false
+
+		for (const key of Object.keys(query))
+			if (!this._match(query[key], document[key], strictList)) return false
+
+		return true	// all keys in the query match with document
 	}
 
 	/**
 	 * Find one document in this collection from the `pos` position
+	 * 
 	 * @param {any} query The document to be searched
+	 * @param {boolean} strictList (default:false) If there are list comparations, query:[1] document:[1,2,3] will be equal, because query[0] === document[0]. If you do not want this comparation, set this param to true.
 	 * @param {number} pos The start position of search
 	 * @returns {object} object with the position and the document
 	 */
-	findOne (query, pos = 0) {
+	findOne (query, strictList = false, pos = 0) {
 		for (; pos < this.length; pos ++) {
-
 			const document = this.DBVALUE[this.db][this.collection][pos]
-			if (typeof query !== typeof document) continue
 
-			if (this._match(query, document)) return {pos, document}
+			if (this._match(query, document, strictList)) return {pos, document}
 		}
 	}
 
@@ -91,19 +124,20 @@ class Collection {
 	 * Find all documents that match with query
 	 * 
 	 * @param {object} query The document to be searched
+	 * @param {boolean} strictList (default:false) If there are list comparations, query:[1] document:[1,2,3] will be equal, because query[0] === document[0]. If you do not want this comparation, set this param to true.
 	 * @returns {array} array in each position one document and its position inside the collection
 	 */
-	find (query) {
+	find (query, strictList = false) {
 		let pos = 0
 		const res = []
 
 		// eslint-disable-next-line no-constant-condition
 		while (true) {
-			const document = this.findOne(query, pos)
-			if (document) break
+			const document = this.findOne(query, strictList, pos)
+			if (!document) break
 
 			res.push(document)
-			pos = document ? document.pos : pos
+			pos = document.pos + 1
 		}
 
 		return res
