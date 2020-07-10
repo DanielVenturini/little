@@ -190,6 +190,9 @@ describe('Little specification', function () {
 		})
 
 		it('`.use` to a new database should not create it until a new document will be inserted', function () {
+			db.use('123')
+			assert.isUndefined(db.db, 'an invalid name should produces an undefined setter')
+
 			const notexists = 'dbnotexists'
 			db.use('dbnotexists')
 			assert.notInclude(db._getDBs(), notexists)
@@ -209,6 +212,10 @@ describe('Little specification', function () {
 			assert.equal(db.show_collections(true), '')
 			assert.equal(db.show_collections.call(Object.assign(db, {db: 'names', DBVALUE: {names: {col1: [1]}}}), true), 'col1')
 			assert.equal(db.show_collections.call(Object.assign(db, {db: 'names', DBVALUE: {names: {col1:[1],col2:[1]}}}), true), 'col1\ncol2')
+			assert.isUndefined(new Little().show_dbs(), '', 'there are not dbs')
+			assert.equal(new Little().show_dbs(true), '', 'there are not dbs')
+
+			assert.isUndefined(db.show_collections(false))
 		})
 
 		it('`.collection` should return undefined when the `db` is not setted', function () {

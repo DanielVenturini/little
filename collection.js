@@ -5,6 +5,7 @@ class Collection {
 
 	/**
 	 * A collection class that allows to operate in it
+	 * 
 	 * @param {string} collection The collection name
 	 * @param {Little} little several utils functions are in the Little object
 	 */
@@ -17,6 +18,8 @@ class Collection {
 
 	/**
 	 * Creates a new collection. This method must be called only from Collection.insert(), where there is warranty that there is no the `collection`.
+	 * 
+	 * @private
 	 */
 	_createCollection () {
 		const newCollection = {[this.collection]: []}
@@ -27,7 +30,9 @@ class Collection {
 
 	/**
 	 * Verifies if collection `collection` exists in `DBVALUE`.`db`
+	 * 
 	 * @param {string} collection 
+	 * @private
 	 * @returns {boolean} indicates if the `db`.`collection` exists
 	 */
 	_collectionExists () {
@@ -67,8 +72,10 @@ class Collection {
 
 	/**
 	 * Returns the value if it was wrapped
+	 * 
 	 * @param {any} value The binding that wrappes the value
 	 * @example .wrappedValue (new String('brazil')) -> 'brazil'
+	 * @private
 	 * @returns {any} value wrapped or the object
 	 */
 	_wrappedValue (value) {
@@ -79,11 +86,12 @@ class Collection {
 
 	/**
 	 * Verify if the query and document match
-	 *  
+	 * 
 	 * @param {any} query The query to search
 	 * @param {any} document The document to match
 	 * @param {boolean} strictList (default:false) If there are list comparations, query:[1] document:[1,2,3] will be equal, because query[0] === document[0]. If you do not want this comparation, set this param to true.
 	 * @example ._match({a:10}, {a:10, b:20}) -> true
+	 * @private
 	 * @return {boolean}
 	 */
 	_match (query, document, strictList = false) {
@@ -96,6 +104,7 @@ class Collection {
 
 		// comparation with list should be strict
 		if (strictList && query instanceof Array)
+		/* istanbul ignore else */
 			if (!(document instanceof Array) || query.length !== document.length) return false
 
 		for (const key of Object.keys(query))

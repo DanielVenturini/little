@@ -114,7 +114,7 @@ describe('Collection specifications', function () {
 		assert.equal(obj, collection._wrappedValue(obj))
 		assert.equal(list, collection._wrappedValue(list))
 	})
-
+	
 	it('`._match` should verify if two values match', function () {
 		// should pass
 		assert.isTrue(collection._match(1, 1))
@@ -129,12 +129,13 @@ describe('Collection specifications', function () {
 		assert.isTrue(collection._match({a: [1,2]}, {a:[1,2,3], b:12}))
 		assert.isTrue(collection._match({a: {b: {c: {d: [12, {b: 12}, 25]}}}}, {a: {b: {c: {d: [12, {b: 12}, 25]}}}}), 'object a little bit more complex')
 		assert.isTrue(collection._match({a: {b: {c: {d: [12, {b: 12}]}}}}, {a: {b: {c: {d: [12, {b: 12}, 25]}}}}), 'object a little bit more complex with different list')
-
+		
 		// should fail
 		assert.isFalse(collection._match(1, 2))
 		assert.isFalse(collection._match('1', 1))
 		assert.isFalse(collection._match('bra', 'zil'))
 		assert.isFalse(collection._match([1,2], [1,3]))
+		assert.isFalse(collection._match([1,2], [1,3]), true)
 		assert.isFalse(collection._match([1,2], [1,2,3], true))
 		assert.isFalse(collection._match([1,'2'], [1,'2',3], true))
 		assert.isFalse(collection._match({a: 10}, {a:11}))
