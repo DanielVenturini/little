@@ -65,10 +65,14 @@ describe('Little specification', function () {
 		})
 
 		it('`._open` should open an file and return its content as a Buffer', function () {
-			const resp = db._open.call({dbpath: '/dev/null'})
-
-			assert.exists(resp)
+			let resp = db._open.call({dbpath: '/dev/null'})
 			assert.instanceOf(resp, Buffer)	// eslint-disable-line no-undef
+
+			resp = db._open.call({dbpath: '/dev/null'}, 'r')
+			assert.instanceOf(resp, Buffer, 'using param `r`')	// eslint-disable-line no-undef
+
+			resp = db._open.call({dbpath: '/dev/null'}, 'w')
+			assert.instanceOf(resp, fs.WriteStream)
 		})
 
 		it('`._getString` should return a string from a Buffer', function () {
@@ -154,9 +158,11 @@ describe('Little specification', function () {
 
 		it('`_createFile` should create the `dbpath` and return a WriteStream', function () {
 			const resp = db._createFile.call({dbpath})
-			assert.exists(resp)
-			assert.instanceOf(resp, fs.WriteStream)
-			assert.isTrue(fs.existsSync(dbpath))
+			resp.on('ready', function () {
+				assert.exists(resp)
+				assert.instanceOf(resp, fs.WriteStream)
+				assert.isTrue(fs.existsSync(dbpath))
+			})
 		})
 
 		it('`.close` should create the `dbpath` file')
@@ -165,8 +171,8 @@ describe('Little specification', function () {
 
 	describe('public interfaces', function () {
 		before(function () {
-			deletedbpath()
-			createValidDbFile()
+			return deletedbpath()
+			.then(createValidDbFile)
 			.then(function () {
 				db = new Little(dbpath)	// creates a new instance
 			})

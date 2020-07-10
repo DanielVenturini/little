@@ -22,12 +22,56 @@ function createValidDbFile() {
  * If not, the `fs.unlinkSync` should throws an `ENOENT`
  * 
  */
-function deletedbpath (path = dbpath) {
+async function deletedbpath (path = dbpath) {
 	try{
-		fs.unlinkSync(path)
+		await fs.unlinkSync(path)
 	} catch(err) {
 		assert.throw(function () {throw err}, `ENOENT: no such file or directory, unlink '${path}'`)
 	}
 }
 
-module.exports = {dbpath, createValidDbFile, deletedbpath}
+/**
+ * Returns a random lower ASCII char [a-z]
+ * @returns string
+ */
+function _getLower () {
+	return String.fromCharCode(Math.floor(97 + Math.random() * 25.9))
+}
+
+/**
+ * Returns a random upper ASCII char [A-Z]
+ * @returns string
+ */
+function _getUpper () {
+	return String.fromCharCode(Math.floor(65 + Math.random() * 25.9))
+}
+
+/**
+ * Returns a random digit (0-9)
+ * @returns string
+ */
+function _getDigit () {
+	return Math.floor(Math.random() * 9.9).toString()
+}
+
+/**
+ * Returns a simbol `.` or `_`
+ * @returns string
+ */
+function _getSymbol () {
+	return Math.random() < 0.5 ? '.' : '_'
+}
+
+/**
+ * It always returns a different name that was not returned before. The first digit return will be a
+ * @returns string
+ */
+function notExistsName () {
+	const seq = [_getLower(), _getUpper(), _getDigit(), _getSymbol()]
+	return seq
+	// while (true) {
+
+	// }
+}
+
+module.exports = {dbpath, createValidDbFile, deletedbpath, notExistsName}

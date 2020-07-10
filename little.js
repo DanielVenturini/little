@@ -44,8 +44,11 @@ class Little {
 	 * This function open the `dbpath` and return as a `Buffer`
 	 * @returns Buffer
 	 */
-	_open () {
-		return fs.readFileSync(this.dbpath)
+	_open (flag = 'r') {
+		if (flag === 'r')
+			return fs.readFileSync(this.dbpath)
+		else
+			return fs.createWriteStream(this.dbpath)
 	}
 
 	/**
@@ -182,12 +185,13 @@ class Little {
 		else this.db = undefined
 	}
 
+	/**
+	 * Save the db in the file `dbpath`. If the file does not exist, it will be created.
+	 */
 	save () {
-		//
-	}
-
-	close () {
-		//
+		let fileWritter = this._existsFile() ? this._open('w') : this._createFile()
+		fileWritter.write(JSON.stringify(this.DBVALUE))
+		fileWritter.close()
 	}
 
 	// iterator
