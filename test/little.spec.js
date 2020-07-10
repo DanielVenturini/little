@@ -223,10 +223,21 @@ describe('Little specification', function () {
 			assert.instanceOf(db.collection('collectionnotexists'), Collection)
 			assert.instanceOf(db.collection('city'), Collection)
 		})
+
+		it('`.save` should save in an existente file or create a new one', function () {
+			db.save.call(Object.assign(db, {dbpath}))
+			assert.isTrue(fs.existsSync(dbpath))
+
+			const newpath = dbpath + 'notexists'
+			assert.isFalse(fs.existsSync(newpath), 'this file will be create, thus, it must not exists')
+			db.save.call(Object.assign(db, {dbpath: newpath}))
+			assert.isTrue(fs.existsSync(newpath), 'the file should be created')
+		})
 	})
 
 	after(function () {
 		deletedbpath()
 		deletedbpath(dbpathtestopen)
+		deletedbpath(dbpath + 'notexists')
 	})
 })

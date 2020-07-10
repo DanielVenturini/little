@@ -148,7 +148,13 @@ class Collection {
 	 */
 	[Symbol.iterator] () {
 		return {
-			next () {}
+			pos: 0,
+			collection: this.DBVALUE[this.db][this.collection],
+			next () {
+				while (this.pos < this.collection.length) return {done: false, value: this.collection[this.pos ++]}
+
+				return {done:true}
+			}
 		}
 	}
 }

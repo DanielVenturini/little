@@ -189,5 +189,32 @@ describe('Collection specifications', function () {
 		assert.lengthOf(collection.find({name:'notexists'}), 0)
 	})
 
+	it('`iterator` should creates an iterator function', function () {
+		const length = collection.length
+		const iterator = collection[Symbol.iterator]()
+
+		for (let i = 0; i < length; i ++) {
+			const value = iterator.next()
+			assert.propertyVal(value, 'done', false)
+			assert.exists(value.value)
+		}
+
+		const theLastValue = {last: 'itshouldcontains'}
+		collection.insert(theLastValue)
+
+		assert.lengthOf(iterator.collection, length + 1, 'a new document was inserted')
+		db.use('names')
+		assert.lengthOf(db.collection('city'), length + 1)
+
+		// theLastValue
+		let value = iterator.next()
+		assert.propertyVal(value, 'done', false)
+		assert.exists(value.value)
+
+		value = iterator.next()
+		assert.propertyVal(value, 'done', true, 'there are no more values in iterator')
+		assert.notExists(value.value)
+	})
+
 	after(deletedbpath)
 })

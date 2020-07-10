@@ -193,17 +193,6 @@ class Little {
 		fileWritter.write(JSON.stringify(this.DBVALUE))
 		fileWritter.close()
 	}
-
-	// iterator
-	[Symbol.iterator] (collection, query) {
-		return {
-			db: this.db,
-			collection: collection,
-			query: query,
-			pos: 0,
-			next () {}
-		}
-	}
 }
 
 module.exports = Little
