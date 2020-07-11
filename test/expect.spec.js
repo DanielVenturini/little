@@ -1,6 +1,6 @@
 const {expect} = require('chai')
-const googol = Math.pow(10, 100)
-const googolplex = Math.pow(10, googol)
+const googol = 10 ** 100
+const googolplex = 10 ** googol
 
 const small = [{a:'b'}]
 const smallcopy = [{a:'b'}]	// just another reference
@@ -49,6 +49,34 @@ describe('Expect', function () {
 			expect(obj).to.have.deep.property('c', {key:'value', googol})
 		})
 
+		it('#ownProperty should verifies a non-inherited property', function () {
+			// OVERLOAD
+			expect(obj).to.not.have.ownProperty('toString')
+			expect(small).to.have.deep.ownProperty('0', {a: 'b'}).to.be.deep.equal({a: 'b'})
+			expect(beverages).to.have.ownProperty('tea').to.have.lengthOf(4)
+		})
+
+		it('#include should verifies a value property in the object. It ignores the prototype verification', function () {
+			// const obj = {a: 12, b: small, c: {key:'value', googol}, [small]: 'small'}
+			expect('string').to.include('rin').that.has.lengthOf(6)
+			expect(obj).to.deep.include({c: {key: 'value', googol}})
+			expect(obj).to.include({c: obj.c})
+			expect(list).to.include('str')
+			expect({a:1, b:2, c:3}).to.be.an('object').that.includes({a:1, c:3}, 'it verifies a piece of an object')
+			Object.prototype.bbb = 2021	// eslint-disable-line no-extend-native
+			expect(obj).to.deep.include({bbb: 2021})
+			expect(obj).to.not.deep.own.include({bbb: 2021})
+			expect(obj).to.not.include(obj.toString)
+			expect(obj).to.nested.deep.include({'b[0]': {a:'b'}})
+			expect(obj).to.not.include({d: 'anyvalue'})	// VERY DANGEROUS: use expect(obj).to.not.have.any.keys('d'), instead
+			expect(obj, 'error happened because there is no that value').to.not.include({b: 'small'})
+			// `include` can be used as a language chain to `keys` and `member`
+			expect(obj).to.include.any.keys('a', 'k')
+			expect(list).to.include.members([1,2,3])
+		})
+
+		it('#members')
+		it('#keys')
 	})
 
 	describe('operators', function () {
