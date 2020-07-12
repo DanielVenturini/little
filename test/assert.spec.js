@@ -32,15 +32,15 @@ describe('Assert', function () {
 
 		it('`.strictEqual` should computes a strict equality', function () {
 			const daniel = 'brazil'
-			//assert.throw(strictEqual, '`.strictEqual` should throws an error when evalutes `1` and `\'1\'`')
-			//assert.throw(function () {strictEqual({daniel}, {daniel})}, '`.strictEqual` should throws an error when evalutes `1` and `\'1\'`')
+			// assert.throw(strictEqual, '`.strictEqual` should throws an error when evalutes `1` and `\'1\'`')
+			// assert.throw(function () {strictEqual({daniel}, {daniel})}, '`.strictEqual` should throws an error when evalutes `1` and `\'1\'`')
 			assert.strictEqual(1, 1)
 			assert.strictEqual(daniel, 'brazil')
 		})
 
 		it('`.deepEqual` should computes an equality by reference', function () {
 			const daniel = 'brazil'
-			assert.deepEqual({daniel}, {'daniel': daniel})
+			assert.deepEqual({daniel}, {daniel: daniel})
 			assert.deepEqual(daniel, 'brazil')
 			assert.deepEqual(1, 1)
 			assert.deepEqual([1,2,3,4,5], [1,2,3,4,5])
@@ -133,16 +133,16 @@ describe('Assert', function () {
 		})
 
 		it('`.isNaN` should works only with NaN', function () {
-			assert.isNaN(0/0)
-			assert.isNaN(Infinity/Infinity)
-			assert.isNaN(Infinity-Infinity)
-			assert.isNaN(undefined/23)
-			assert.isNaN('brazil'/3)
+			assert.isNaN(0 / 0)
+			assert.isNaN(Infinity / Infinity)
+			assert.isNaN(Infinity - Infinity)
+			assert.isNaN(undefined / 23)
+			assert.isNaN('brazil' / 3)
 		})
 
 		it('`.isNotNaN` should works with any non-nan values', function () {
-			assert.isNotNaN(0/3)
-			assert.isNotNaN(Infinity/7)
+			assert.isNotNaN(0 / 3)
+			assert.isNotNaN(Infinity / 7)
 			assert.isNotNaN(undefined)
 			assert.isNotNaN('brazil')
 		})
@@ -197,10 +197,10 @@ describe('Assert', function () {
 		})
 
 		it('`.isObject` should works only with `Object`s like', function () {
-			class MyErr {constructor(){}}	// eslint-disable-line no-empty-function
+			class MyErr {constructor () {}}	// eslint-disable-line no-empty-function
 			assert.isObject(new MyErr())
-			assert.isObject({'0':'b','1':'r','2':'a','3':'z','4':'i','5':'l'})
-			assert.isObject({'d': 2})
+			assert.isObject({0:'b',1:'r',2:'a',3:'z',4:'i',5:'l'})
+			assert.isObject({d: 2})
 		})
 
 		it('`.isNotObject` should works only with non `Object`s like', function () {
@@ -338,7 +338,7 @@ describe('Assert', function () {
 		})
 
 		it('`.instanceOf` should verifies the constructor instance', function () {
-			class Ventu extends Error {constructor() {super()}}
+			class Ventu extends Error {constructor () {super()}}
 			assert.instanceOf(new Ventu(), Error)
 			assert.instanceOf(new String('brazil'), Object)	// eslint-disable-line
 			// assert.instanceOf('brazil', String)	// it does not work
@@ -361,7 +361,7 @@ describe('Assert', function () {
 			const obj = {prop1: 'val1', prop2: 'val2'}
 			assert.include(l, 3)
 			assert.include(str, 'bra')
-			assert.include(obj, {'prop1': 'val1'})
+			assert.include(obj, {prop1: 'val1'})
 			assert.include(obj, {toString: obj.toString})
 		})
 
@@ -504,7 +504,7 @@ describe('Assert', function () {
 			assert.notNestedPropertyVal(obj, 'tea.chai', false)
 		})
 
-		it('`deepNestedPropertyVal` should verifies deeply nested if a property has a val', function () {
+		it('`.deepNestedPropertyVal` should verifies deeply nested if a property has a val', function () {
 			const obj = {tea: {chai: true}, str: 'str', n: 123}
 			assert.deepNestedPropertyVal(obj, 'tea', {chai: true})
 		})
@@ -513,5 +513,73 @@ describe('Assert', function () {
 			const obj = {tea: {chai: true}, str: 'str', n: 123}
 			assert.notDeepNestedPropertyVal(obj, 'n', '123')
 		})
+
+		it('`.lengthOf` should verifies the length of an object', function () {
+			const obj = {a: 10, b:'k'}
+			obj.length = 10
+			assert.lengthOf(obj, 10, '.lengthOf verifies the `length` property')
+
+			assert.lengthOf([1,2,3,4], 4)
+			assert.lengthOf('daniel', 6)
+			assert.lengthOf(new Set([1,2,3]), 3)
+		})
+
+		it('`.hasAnyKeys` should verifies if the obj has some of those keys', function () {
+			assert.hasAnyKeys({a: 10, b:'k'}, ['a', 'k', 'j'])
+			assert.hasAnyKeys(new Map([['a', 'value'], ['b', 12]]), ['a', 'j'])
+		})
+
+		it('`.hasAllKeys` should verifies all keys in the object', function () {
+			const obj = {obj: 'key', map: 12, three: 3}
+			assert.hasAllKeys(obj, ['obj', 'map', 'three'])
+			// THE NEXT DOES NOT WORK, BUT IN `CONTAINS`, IT DOES
+			// assert.hasAllKeys(obj, ['obj', 'map'], 'obj has more than those keys')
+		})
+
+		it('`.containsAllKeys` should verifies if the object has AT LEAST all keys', function () {
+			const obj = {obj: 'key', map: 12, three: 3}
+			assert.containsAllKeys(obj, ['obj', 'map', 'three'])
+			assert.containsAllKeys(obj, ['obj', 'map'], 'obj should has at least all these keys')
+		})
+
+		it('`.doesNotHaveAnyKeys` should verifies if object has none of those keys', function () {
+			const obj = {obj: 'key', map: 12, three: 3}
+			assert.doesNotHaveAnyKeys(obj, ['object', 'mapped', 'two'], 'at least `two` is not in the `obj`')
+			assert.doesNotHaveAnyKeys(obj, {objj: 12, mapped: 'three', two: 2})
+		})
+
+		it('`.doesNotHaveAnyDeepKeys` should verifies deeply if the object has none of the keys provider', function () {
+			const obj = {obj: 'key', map: 12, three: 3}
+			assert.doesNotHaveAnyDeepKeys(obj, ['objj', 'maped', 'two'])
+			assert.doesNotHaveAnyDeepKeys(new Map([[{a:'b'}, 'kvalo']]), {a:'a'})
+		})
+
+		it('`.doesNotHaveAllKeys` should verifies if object does not have at least one of those keys', function () {
+			const obj = {obj: 'key', map: 12, three: 3}
+			assert.doesNotHaveAllKeys(obj, {obj: 'key', map: 12, three: 3, two: 3}, 'at least `two` is not in the obj')
+			assert.doesNotHaveAllKeys(obj, ['obj', 'three'], '`map` is key but is not expected')
+		})
+
+		it('`.doesNotHaveAllDeepKeys` should verifies if the object has no at least one of the keys', function () {
+			const obj = {obj: 'key', map: 12, three: 3}
+			assert.doesNotHaveAllDeepKeys(obj, ['obj', 'map', 'two'])
+			assert.doesNotHaveAllDeepKeys(new Map([[{a: '1'}, 12]]), {a: 1})
+		})
+
+		it('`.hasAllDeepKeys` should verifies if object has all keys deeply', function () {
+			const obj = {obj: 'key', map: 12, three: 3}
+			const obj2 = {[obj]: 'key', day: 7}
+
+			assert.hasAllDeepKeys(obj, ['obj', 'map', 'three'])
+			assert.hasAllDeepKeys(obj2, ['day', obj])
+		})
+
+		it('`.containsAllDeepKeys` should verifies that object contains all of the keys deeply provided', function () {
+			const obj = {obj: 'key', map: 12, three: 3}
+			assert.containsAllDeepKeys(obj, ['obj', 'map', 'three'])
+			assert.containsAllDeepKeys(obj, ['obj', 'map'], 'obj contains at least all keys provided, but it may contains more')
+			assert.containsAllDeepKeys(new Map([[{one: 'one'}, 'valueOne'], [1,2]]), {one:'one'})
+		})
+
 	})
 })
