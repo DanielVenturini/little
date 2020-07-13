@@ -16,16 +16,16 @@ describe('Collection specifications', function () {
 	})
 
 	it('`._createCollection` should create a new collection', function () {
-		
+
 		let col1 = 'coll1'
 		db.use('db')
 		db.collection(col1)._createCollection()
-		assert.deepNestedInclude(db.DBVALUE, {['db.'+col1]: []}, 'db exists and collection not')
+		assert.deepNestedInclude(db.DBVALUE, {['db.' + col1]: []}, 'db exists and collection not')
 
 		let col2 = 'coll2'
 		db.collection(col2)._createCollection()
-		assert.deepNestedInclude(db.DBVALUE, {['db.'+col1]: []}, 'db exists and there is collection there')
-		assert.deepNestedInclude(db.DBVALUE, {['db.'+col2]: []}, 'db exists and there is collection there')
+		assert.deepNestedInclude(db.DBVALUE, {['db.' + col1]: []}, 'db exists and there is collection there')
+		assert.deepNestedInclude(db.DBVALUE, {['db.' + col2]: []}, 'db exists and there is collection there')
 
 		db.use('dbnotexists0')
 		db.collection('coll1')._createCollection()
@@ -55,7 +55,8 @@ describe('Collection specifications', function () {
 		db.use('dbnotexists')
 		assert.equal(db.collection('colnotexists').length, 0, 'db not exists')
 
-		db.use('names')	// default db in the test
+		// default db in the test
+		db.use('names')
 	})
 
 	it('`.insert` should insert new values and create new collection, if it needs', function () {
@@ -114,7 +115,7 @@ describe('Collection specifications', function () {
 		assert.equal(obj, collection._wrappedValue(obj))
 		assert.equal(list, collection._wrappedValue(list))
 	})
-	
+
 	it('`._match` should verify if two values match', function () {
 		// should pass
 		assert.isTrue(collection._match(1, 1))
@@ -129,7 +130,7 @@ describe('Collection specifications', function () {
 		assert.isTrue(collection._match({a: [1,2]}, {a:[1,2,3], b:12}))
 		assert.isTrue(collection._match({a: {b: {c: {d: [12, {b: 12}, 25]}}}}, {a: {b: {c: {d: [12, {b: 12}, 25]}}}}), 'object a little bit more complex')
 		assert.isTrue(collection._match({a: {b: {c: {d: [12, {b: 12}]}}}}, {a: {b: {c: {d: [12, {b: 12}, 25]}}}}), 'object a little bit more complex with different list')
-		
+
 		// should fail
 		assert.isFalse(collection._match(1, 2))
 		assert.isFalse(collection._match('1', 1))
@@ -191,7 +192,7 @@ describe('Collection specifications', function () {
 	})
 
 	it('`iterator` should creates an iterator function', function () {
-		const length = collection.length
+		let length = collection.length
 		const iterator = collection[Symbol.iterator]()
 
 		for (let i = 0; i < length; i ++) {

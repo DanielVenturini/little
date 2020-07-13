@@ -7,11 +7,11 @@ const smallcopy = [{a:'b'}]	// just another reference
 const obj = {a: 12, b: small, c: {key:'value', googol}, [small]: 'small'}
 const list = [1,2,3,'str', small, obj]
 
-const foo = 'bar', beverages = {tea: ['chai', 'match', 'oolong', {'ame[rica': ['south', 'america']}], bra: 'zilll', num: [1,2,3]}
+const beverages = {tea: ['chai', 'match', 'oolong', {'ame[rica': ['south', 'america']}], bra: 'zilll', num: [1,2,3]}, foo = 'bar'
 
 describe('Expect', function () {
 	describe('functions', function () {
-		it('#a or #an should verifies the type of a binding', function () {
+		it('#a/an should verifies the type of a binding', function () {
 			expect(32).to.be.a('number').that.is.a('Number')
 			expect({}).to.be.an('Object')
 			expect([1,2,3]).to.be.a('array').that.is.not.an('object')
@@ -36,9 +36,9 @@ describe('Expect', function () {
 			expect('daniel').to.have.lengthOf(6).but.not.have.lengthOf(12)
 			expect([1,2,3,4,5]).to.have.length(5)
 
-			const obj = {a: 12}
-			Object.setPrototypeOf(obj, {length: 4})
-			expect(obj).to.have.lengthOf(4)
+			const obj1 = {a: 12}
+			Object.setPrototypeOf(obj1, {length: 4})
+			expect(obj1).to.have.lengthOf(4)
 		})
 
 		it('#property should verifies a property objects and its value', function () {
@@ -75,8 +75,32 @@ describe('Expect', function () {
 			expect(list).to.include.members([1,2,3])
 		})
 
-		it('#members')
-		it('#keys')
+		it('#members should warrants that a array has the same values as expected -- non-ordened', function () {
+			// expect(small).to.be.an('array').that.have.deep.members({a:'b'})
+			expect([1,2,3,4]).to.have.members([4,2,3,1])
+			expect([1,2,3,4,5]).to.not.have.members([1,3,5])
+			expect([1,2,3]).to.have.ordered.members([1,2,3])
+
+			// include verifies as a super set
+			expect([1,2,3,4]).to.include.members([2,1])
+			expect([1,2,3,4]).to.include.members([1,4])	// .ordered does not work here
+		})
+
+		it('#keys/key should verifies if the target has a non-inherited properties', function () {
+			expect(small, '`toString` is an inherited key').to.not.have.key('toString')
+			expect(small).to.have.key({0:'this value is ignored'})
+			expect(obj, '`.any` produces a single verification').to.have.have.any.keys('a', 'b')
+			expect(obj).to.have.keys({a:'ign',b:'ign',c:'ign',[small]:'ign'})
+
+			// map or set each key should be provided as a separated argument
+			expect(new Map([['a',1], ['b',2]])).to.have.all.keys('a', 'b')
+			expect(new Map([['a',1], ['b',2]])).to.have.any.key('b')
+
+			// `.not` IS BETTER WITH `.any`
+			expect({a:1,b:2,c:3}).to.not.have.any.keys('k','a','key')
+
+			expect({a:1,b:2}).to.include.all.keys('a','b')
+		})
 	})
 
 	describe('operators', function () {
@@ -93,7 +117,7 @@ describe('Expect', function () {
 			expect(4).not.to.be.a('string')
 			expect(beverages).not.to.have.property('brazil')
 			expect(googol).not.be.greaterThan(googolplex)
-			expect(() => {return 'phantom'}).to.not.throws()
+			expect(() => 'phantom').to.not.throws()
 		})
 
 		it('`.deep` should changes the evaluates to a strict the methods `.equal`, `.include`, `.members`, `.keys` and `.property` without strict', function () {
@@ -101,9 +125,9 @@ describe('Expect', function () {
 			expect(thr).to.throws()
 			expect(beverages.num).to.be.deep.equal([1,2,3])
 
-			const obj = {a: {c: 'd'}, [small]: 'reallysmall'}
-			expect(function () {expect(obj).to.include({a: {c: 'd'}})}).to.throws()
-			expect(obj).to.deep.include({a: {c: 'd'}})
+			const obj1 = {a: {c: 'd'}, [small]: 'reallysmall'}
+			expect(function () {expect(obj1).to.include({a: {c: 'd'}})}).to.throws()
+			expect(obj1).to.deep.include({a: {c: 'd'}})
 
 			// `.to.have.members` is so awkward
 			expect(function () {expect([1,2,3,small]).to.have.members([smallcopy,1,3,2])}).to.throws()
@@ -121,17 +145,17 @@ describe('Expect', function () {
 		})
 
 		it('`.own` forces the `.property` and `.include` to ignore inherited values', function () {
-			const obj = {a: 1, [small]: 3}
+			const obj1 = {a: 1, [small]: 3}
 
-			expect(obj).to.have.own.property('a')
-			expect(obj).to.have.property('toString')
-			expect(function () {expect(obj).to.have.own.property('toString')}).to.throws()	// nice
+			expect(obj1).to.have.own.property('a')
+			expect(obj1).to.have.property('toString')
+			expect(function () {expect(obj1).to.have.own.property('toString')}).to.throws()	// nice
 		})
 
 		it('`.ordered` forces the `.members` to requires in the same order', function () {
-			const obj = ['a',1,small,3,2,1]
-			expect(obj).to.have.ordered.members(['a',1,small,3,2,1]).but.not.have.ordered.members([1,3,2,1])
-			// expect(obj).to.include.ordered.members([3,2,1])
+			const obj1 = ['a',1,small,3,2,1]
+			expect(obj1).to.have.ordered.members(['a',1,small,3,2,1]).but.not.have.ordered.members([1,3,2,1])
+			// expect(obj1).to.include.ordered.members([3,2,1])
 		})
 	})
 })

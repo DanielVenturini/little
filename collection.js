@@ -66,8 +66,7 @@ class Collection {
 	 * @returns number
 	 */
 	get length () {
-		if (!this._collectionExists(this.collection)) return 0
-		else return this.DBVALUE[this.db][this.collection].length
+		return this._collectionExists(this.collection) ? this.DBVALUE[this.db][this.collection].length : 0
 	}
 
 	/**
@@ -79,9 +78,9 @@ class Collection {
 	 * @returns {any} value wrapped or the object
 	 */
 	_wrappedValue (value) {
-		return value instanceof Number ||
-						value instanceof String ||
-						value instanceof Boolean ? value.valueOf() : value
+		return value instanceof Number
+					|| value instanceof String
+					|| value instanceof Boolean ? value.valueOf() : value
 	}
 
 	/**

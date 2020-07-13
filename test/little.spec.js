@@ -47,7 +47,7 @@ describe('Little specification', function () {
 
 		it('`._getJson` should return a JSON object from a string', function () {
 			const string = '{"a": 10, "b": [1,2,3], "c":"brazil"}'
-			const obj = {a: 10, b: [1,2,3], c:"brazil"}
+			const obj = {a: 10, b: [1,2,3], c:'brazil'}
 			const resp = db._getJson(string)
 
 			assert.isObject(resp)
@@ -56,7 +56,7 @@ describe('Little specification', function () {
 
 		it('`._getText` should return a string from an object', function () {
 			const string = '{"a":10,"b":[1,2,3],"c":"brazil"}'
-			const obj = {a: 10, b: [1,2,3], c:"brazil"}
+			const obj = {a: 10, b: [1,2,3], c:'brazil'}
 			const resp = db._getText.call({DBVALUE: obj})
 
 			assert.exists(resp)
@@ -87,24 +87,24 @@ describe('Little specification', function () {
 
 		it('`._isThereDbs` should return if there is any dbs', function () {
 			assert.isFalse(db._isThereDbs())
-			assert.isTrue(db._isThereDbs.call({DBVALUE: {'1': 1}}))
+			assert.isTrue(db._isThereDbs.call({DBVALUE: {1:1}}))
 		})
 
 		it('`._dbExists` should verifies if `db` exists', function () {
-			const DBVALUE = {'dbtest': 123}
+			const DBVALUE = {dbtest: 123}
 			assert.isFalse(db._dbExists.call({db: 'brazil', DBVALUE}))
 			assert.isTrue(db._dbExists.call({db: 'dbtest', DBVALUE}))
 		})
 
 		it('`._isThereCollections` should verifies if there is any collections in `db`', function () {
-			const DBVALUE = {'dbtest': {'collection1': [123]}}
+			const DBVALUE = {dbtest: {collection1: [123]}}
 			assert.isFalse(db._isThereCollections.call(Object.assign(db, {db: 'dbtest', DBVALUE: {}})), 'there is not database')
 			assert.isFalse(db._isThereCollections.call(Object.assign(db, {db: 'dbnotexists', DBVALUE})), 'database does not exist')
 			assert.isTrue(db._isThereCollections.call(Object.assign(db, {db: 'dbtest', DBVALUE})))
 		})
 
 		it('`._getDBs` should returns a list of databases', function () {
-			const DBVALUE = {'dbtest': {'collection1': [123]}}
+			const DBVALUE = {dbtest: {collection1: [123]}}
 			assert.isArray(db._getDBs.call(Object.assign(db, {DBVALUE: {}})))
 			assert.isEmpty(db._getDBs.call(Object.assign(db, {DBVALUE: {}})))
 
@@ -125,7 +125,7 @@ describe('Little specification', function () {
 
 		describe('`#._openDB` method', function () {
 			it('`._openDB` should open a file and return a JSON', function () {
-				const obj = {a: 10, b: [1,2,3], c:"brazil"}
+				const obj = {a: 10, b: [1,2,3], c:'brazil'}
 				const changedThis = Object.assign(db, {dbpath: dbpathtestopen})
 				const resp = db._openDB.call(changedThis)
 				assert.exists(resp)

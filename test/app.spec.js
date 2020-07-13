@@ -1,7 +1,13 @@
 const {jungleName, zeroPad} = require('../app')
-const { assert } = require('chai')
+const {assert} = require('chai')
 
 describe('#zeroPad()', function () {
+	it('should return the same number when `digits` is zero', function () {
+		const value = 10
+		const resp = zeroPad(value)
+		assert.strictEqual(resp, value)
+	})
+
 	it('should return a string', function () {
 		assert.isString(zeroPad(12, 4))
 	})

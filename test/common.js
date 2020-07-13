@@ -6,7 +6,7 @@ const dbpath = './testdbvalue'
 /**
  * Creates a valid `dbpath` file to test the pbulic interfaces
  */
-function createValidDbFile() {
+function createValidDbFile () {
 	return new Promise(function (resolve) {
 		const file = fs.createWriteStream(dbpath)
 		file.on('ready', function () {
@@ -20,7 +20,6 @@ function createValidDbFile() {
 /**
  * Deletes the `dbpath`, if it exists.
  * If not, the `fs.unlinkSync` should throws an `ENOENT`
- * 
  */
 async function deletedbpath (path = dbpath) {
 	try{

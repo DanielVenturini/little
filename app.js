@@ -33,7 +33,7 @@ function zeroPad (number, digits = 0) {
  */
 function jungleName (fname, lname, number) {
 	const newNumber = number % MAX_CHAIR
-	return zeroPad(newNumber, 3) + ' ' + lname
+	return `${zeroPad(newNumber, 3)} ${lname}`
 }
 
 /**
