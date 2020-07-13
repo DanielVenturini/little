@@ -133,7 +133,7 @@ describe('Little specification', function () {
 			})
 
 			it('`._openDB` should return a JSON when the file does not exist', function () {
-				const changedThis = Object.assign(db, {dbpath: dbpathtestopen + 'doesnotexist'})
+				const changedThis = Object.assign(db, {dbpath: `${dbpathtestopen} doesnotexist`})
 				const resp = db._openDB.call(changedThis)
 
 				assert.exists(resp)
@@ -232,10 +232,11 @@ describe('Little specification', function () {
 		})
 
 		it('`.save` should save in an existente file or create a new one', function () {
+			this.retries(5)	// it may fail for async reasons
 			db.save.call(Object.assign(db, {dbpath}))
 			assert.isTrue(fs.existsSync(dbpath))
 
-			const newpath = dbpath + 'notexists'
+			const newpath = `${dbpath} notexists`
 			assert.isFalse(fs.existsSync(newpath), 'this file will be create, thus, it must not exists')
 			db.save.call(Object.assign(db, {dbpath: newpath}))
 			assert.isTrue(fs.existsSync(newpath), 'the file should be created')
@@ -245,6 +246,6 @@ describe('Little specification', function () {
 	after(function () {
 		deletedbpath()
 		deletedbpath(dbpathtestopen)
-		deletedbpath(dbpath + 'notexists')
+		deletedbpath(`${dbpath} notexists`)
 	})
 })

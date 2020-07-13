@@ -40,7 +40,7 @@ describe('Assert', function () {
 
 		it('`.deepEqual` should computes an equality by reference', function () {
 			const daniel = 'brazil'
-			assert.deepEqual({daniel}, {daniel: daniel})
+			assert.deepEqual({daniel}, {daniel: daniel})	// eslint-disable-line object-shorthand
 			assert.deepEqual(daniel, 'brazil')
 			assert.deepEqual(1, 1)
 			assert.deepEqual([1,2,3,4,5], [1,2,3,4,5])
@@ -197,7 +197,7 @@ describe('Assert', function () {
 		})
 
 		it('`.isObject` should works only with `Object`s like', function () {
-			class MyErr {constructor () {}}	// eslint-disable-line no-empty-function
+			class MyErr {}
 			assert.isObject(new MyErr())
 			assert.isObject({0:'b',1:'r',2:'a',3:'z',4:'i',5:'l'})
 			assert.isObject({d: 2})
@@ -227,7 +227,7 @@ describe('Assert', function () {
 		})
 
 		it('`.isNotArray` should works only with non array values', function () {
-			const f = () => arguments
+			const f = () => arguments	// eslint-disable-line prefer-rest-params
 			assert.isNotArray(f(1,2,3))
 			assert.isNotArray()
 			assert.isNotArray('string')
@@ -253,7 +253,10 @@ describe('Assert', function () {
 			assert.isNumber(072)	// eslint-disable-line
 			assert.isNumber(new Number('1'))	// eslint-disable-line
 			assert.isNumber(new Number('072'))	// eslint-disable-line
-			assert.isNumber(parseInt('100', 2))
+			assert.isNumber(parseInt('100', 2))	// eslint-disable-line prefer-numeric-literals
+			assert.isNumber(0b100)
+			assert.isNumber(0x100)
+			assert.isNumber(0o100)
 			assert.isNumber(parseFloat('12342.234234'))
 		})
 
@@ -338,7 +341,7 @@ describe('Assert', function () {
 		})
 
 		it('`.instanceOf` should verifies the constructor instance', function () {
-			class Ventu extends Error {constructor () {super()}}
+			class Ventu extends Error {}
 			assert.instanceOf(new Ventu(), Error)
 			assert.instanceOf(new String('brazil'), Object)	// eslint-disable-line
 			// assert.instanceOf('brazil', String)	// it does not work

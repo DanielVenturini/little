@@ -20,12 +20,12 @@ describe('Collection specifications', function () {
 		let col1 = 'coll1'
 		db.use('db')
 		db.collection(col1)._createCollection()
-		assert.deepNestedInclude(db.DBVALUE, {['db.' + col1]: []}, 'db exists and collection not')
+		assert.deepNestedInclude(db.DBVALUE, {[`db. ${col1}`]: []}, 'db exists and collection not')
 
 		let col2 = 'coll2'
 		db.collection(col2)._createCollection()
-		assert.deepNestedInclude(db.DBVALUE, {['db.' + col1]: []}, 'db exists and there is collection there')
-		assert.deepNestedInclude(db.DBVALUE, {['db.' + col2]: []}, 'db exists and there is collection there')
+		assert.deepNestedInclude(db.DBVALUE, {[`db. ${col1}`]: []}, 'db exists and there is collection there')
+		assert.deepNestedInclude(db.DBVALUE, {[`db. ${col2}`]: []}, 'db exists and there is collection there')
 
 		db.use('dbnotexists0')
 		db.collection('coll1')._createCollection()
@@ -70,7 +70,7 @@ describe('Collection specifications', function () {
 		collection.insert(obj)
 		assert.equal(collection.length, pos + 1, 'must have a new length')
 
-		const keyNested = 'names.city[' + pos + ']'
+		const keyNested = `names.city[${pos}]`
 		assert.deepNestedInclude(db.DBVALUE, {[keyNested]: obj}, 'must insert correctly')
 
 		db.use('person')
