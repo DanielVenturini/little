@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 
-const {assert} = require('chai')
+const {assert, AssertionError} = require('chai')
 
 describe('Assert', function () {
 	describe('base', function () {
@@ -280,7 +280,7 @@ describe('Assert', function () {
 		})
 	})
 
-	describe('#is* to numbers', function () {
+	describe('Utils to numbers', function () {
 		it('`.isAbove` should calculates a value greater than other', function () {
 			const throwMessage = '`.isAbove` should throws an error when the first value is smaller or equal than the second'
 			assert.throws(function () {assert.isAbove(1, 1, throwMessage)}, throwMessage)
@@ -317,6 +317,25 @@ describe('Assert', function () {
 			assert.isFinite(1)
 			assert.isFinite(googol)
 			assert.isFinite(googolplex)
+		})
+
+		it('`.operator` should compares two numbers with an operator', function () {
+			assert.operator(127, '<=', 128)
+			assert.operator(new Date(), '>', new Date('2020-02-14'), 'it also compares objects')
+			assert.operator('1000', '==', 1e3, 'it also coerces')
+		})
+
+		it('`.closeTo` should creates a range to a value', function () {
+			assert.closeTo(630, 500, 150, 'is 630 major or less than 150 unity from 500?')
+			assert.closeTo(1.028, 1, 0.1)
+			assert.closeTo(1.028, 1, 0.03)
+		})
+
+		it('`.approximately` should verifies if the number is approximately from other by a range value', function () {
+			// THE SAME VALUES AS .closeTo
+			assert.approximately(630, 500, 150)
+			assert.approximately(1.028, 1, 0.1)
+			assert.approximately(1.028, 1, 0.03)
 		})
 	})
 
@@ -539,42 +558,19 @@ describe('Assert', function () {
 			// assert.hasAllKeys(obj, ['obj', 'map'], 'obj has more than those keys')
 		})
 
-		it('`.containsAllKeys` should verifies if the object has AT LEAST all keys', function () {
-			const obj = {obj: 'key', map: 12, three: 3}
-			assert.containsAllKeys(obj, ['obj', 'map', 'three'])
-			assert.containsAllKeys(obj, ['obj', 'map'], 'obj should has at least all these keys')
-		})
-
-		it('`.doesNotHaveAnyKeys` should verifies if object has none of those keys', function () {
-			const obj = {obj: 'key', map: 12, three: 3}
-			assert.doesNotHaveAnyKeys(obj, ['object', 'mapped', 'two'], 'at least `two` is not in the `obj`')
-			assert.doesNotHaveAnyKeys(obj, {objj: 12, mapped: 'three', two: 2})
-		})
-
-		it('`.doesNotHaveAnyDeepKeys` should verifies deeply if the object has none of the keys provider', function () {
-			const obj = {obj: 'key', map: 12, three: 3}
-			assert.doesNotHaveAnyDeepKeys(obj, ['objj', 'maped', 'two'])
-			assert.doesNotHaveAnyDeepKeys(new Map([[{a:'b'}, 'kvalo']]), {a:'a'})
-		})
-
-		it('`.doesNotHaveAllKeys` should verifies if object does not have at least one of those keys', function () {
-			const obj = {obj: 'key', map: 12, three: 3}
-			assert.doesNotHaveAllKeys(obj, {obj: 'key', map: 12, three: 3, two: 3}, 'at least `two` is not in the obj')
-			assert.doesNotHaveAllKeys(obj, ['obj', 'three'], '`map` is key but is not expected')
-		})
-
-		it('`.doesNotHaveAllDeepKeys` should verifies if the object has no at least one of the keys', function () {
-			const obj = {obj: 'key', map: 12, three: 3}
-			assert.doesNotHaveAllDeepKeys(obj, ['obj', 'map', 'two'])
-			assert.doesNotHaveAllDeepKeys(new Map([[{a: '1'}, 12]]), {a: 1})
-		})
-
 		it('`.hasAllDeepKeys` should verifies if object has all keys deeply', function () {
 			const obj = {obj: 'key', map: 12, three: 3}
 			const obj2 = {[obj]: 'key', day: 7}
 
 			assert.hasAllDeepKeys(obj, ['obj', 'map', 'three'])
 			assert.hasAllDeepKeys(obj2, ['day', obj])
+		})
+
+		it('`.containsAllKeys` should verifies if the object has AT LEAST all keys provided', function () {
+			// a single match key will validated the test
+			const obj = {obj: 'key', map: 12, three: 3}
+			assert.containsAllKeys(obj, ['obj', 'map', 'three'])
+			assert.containsAllKeys(obj, ['obj', 'map'], 'obj should has at least all these keys')
 		})
 
 		it('`.containsAllDeepKeys` should verifies that object contains all of the keys deeply provided', function () {
@@ -584,5 +580,77 @@ describe('Assert', function () {
 			assert.containsAllDeepKeys(new Map([[{one: 'one'}, 'valueOne'], [1,2]]), {one:'one'})
 		})
 
+		it('`.doesNotHaveAnyKeys` should verifies if object has NONE of those keys', function () {
+			// a single matched key will fail the test
+			const obj = {obj: 'key', map: 12, three: 3}
+			assert.doesNotHaveAnyKeys(obj, ['object', 'mapped', 'two'], 'at least `two` is not in the `obj`')
+			assert.doesNotHaveAnyKeys(obj, {objj: 12, mapped: 'three', two: 2})
+			assert.doesNotHaveAnyKeys([0,1,2,3,4], ['33', 'kvalue', 'jvalue', 'money'])
+		})
+
+		it('`.doesNotHaveAnyDeepKeys` should verifies deeply if the object has none of the keys provider', function () {
+			const obj = {obj: 'key', map: 12, three: 3}
+			assert.doesNotHaveAnyDeepKeys(obj, ['objj', 'maped', 'two'])
+			assert.doesNotHaveAnyDeepKeys(new Map([[{a:'b'}, 'kvalo']]), {a:'a'})
+		})
+
+		it('`.doesNotHaveAllKeys` should verifies if object does not have at least one of those keys', function () {
+			// a single missing or unbound key will pass the test
+			const obj = {obj: 'key', map: 12, three: 3}
+			assert.doesNotHaveAllKeys(obj, {obj: 'key', map: 12, three: 3, two: 3}, 'at least `two` is not in the obj')
+			assert.doesNotHaveAllKeys(obj, ['obj', 'three'], '`map` is key but is not expected')
+			assert.doesNotHaveAllKeys([1,2,3,4], ['0', '1', '2', '3', '4'], 'unbound key `4` is not in the obj')
+			assert.doesNotHaveAllKeys([1,2,3,4], ['0', '1', '2'], 'missing key `3` is in the obj')
+		})
+
+		it('`.doesNotHaveAllDeepKeys` should verifies if the object has no at least one of the keys', function () {
+			const obj = {obj: 'key', map: 12, three: 3}
+			assert.doesNotHaveAllDeepKeys(obj, ['obj', 'map', 'two'])
+			assert.doesNotHaveAllDeepKeys(new Map([[{a: '1'}, 12]]), {a: 1})
+		})
+
+		it('`.throws` verifies if the callback throws an error, its instance and its message', function () {
+			class MyUnexpectedError extends Error {}
+			const msg = 'There is no one waiting for this'
+			const fn = () => {throw new MyUnexpectedError(msg)}
+
+			assert.throws(fn)
+			assert.throws(fn, msg, 'The error should thrown with that message')
+			assert.throws(fn, /waiting/, 'The error should thrown that match `waiting`')
+			assert.throws(fn, MyUnexpectedError) // The error should be an instance of `MyUnexpectedError`
+			assert.throws(fn, Error) // The error should be an instance of `Error`
+		})
+
+		it('`.doesNotThrow` should verifies if the callback does not throws any error', function () {
+			class MyUnexpectedError extends Error {}
+			const msg = 'There is no one waiting for this'
+			const fn = () => {throw new MyUnexpectedError(msg)}
+			class MyUnexpectedError2 extends AssertionError {}
+
+			assert.doesNotThrow(fn, `if throws, should not have the message ${msg}`)
+			assert.doesNotThrow(fn, /error/, 'if throws, should not match the given pattern')
+			assert.doesNotThrow(fn, MyUnexpectedError2, 'if throws, should not be an instance of MyUnexpectedError2')
+		})
+
+		it('`.sameMembers` should verifies if both arrays have the same members', function () {
+			assert.sameMembers([1,2,3], [3,2,1], 'it works in any order')
+			assert.sameMembers(['k1', 1, 'k2', 2], ['k1', 'k2', 2, 1])
+		})
+
+		it('`.notSameMembers` should verifies if arrays have at least one different value', function () {
+			assert.notSameMembers([1,2,3], [1,3,2,4], '4 is not in the first array')
+			assert.notSameMembers([1,2,3,'str'], [1,3,2,4])
+		})
+
+		it('`.sameDeepMembers` should verifies deeply if both arrays have the same values', function () {
+			assert.sameDeepMembers([1,2,{a: 12},'str'], [2,{a:12},'str',1])
+			assert.sameDeepMembers([{a:1},{b:2},{c:3}], [{b:2},{a:1},{c:3}])
+		})
+
+		it('`.notSameDeepMembers` should verifies deeply at least one value different in arrays', function () {
+			assert.notSameDeepMembers([1,2,{a: {b: [1,2]}}], [{a: {b: [1,2]}},1,3], '3 is not in the first array')
+			assert.notSameDeepMembers([1,2,{a: {b: [1,2]}}], [{a: {b: [1,2,3]}},1,2], '3 is not in the first array.array')
+			assert.notSameDeepMembers([1,2,{a: {b: [3,2,1]}}], [{a: {b: [1,2,3]}},1,2], '3 is not in the first array.array')
+		})
 	})
 })
