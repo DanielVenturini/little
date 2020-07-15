@@ -17,6 +17,14 @@ describe('Expect', function () {
 			expect([1,2,3]).to.be.a('array').that.is.not.an('object')
 			expect(NaN).to.be.a('number')
 			expect(null).to.be.a('null').that.is.not.a('undefined')
+			expect(new Error).to.be.an('error')
+			expect(Promise.resolve()).to.be.a('promise')
+			expect(Symbol('unknow-symbol')).to.be.a('symbol')
+
+			const type = 'braziltype'
+			const obj1 = {a:12, b:small, c:{key:'value', googol}}
+			obj1[Symbol.toStringTag] = type
+			expect(obj1).to.be.a(type).but.not.be.an('object')
 		})
 
 		it('#equal should compare the value', function () {
@@ -56,30 +64,34 @@ describe('Expect', function () {
 			expect(beverages).to.have.ownProperty('tea').to.have.lengthOf(4)
 		})
 
-		it('#include should verifies a value property in the object. It ignores the prototype verification', function () {
-			// const obj = {a: 12, b: small, c: {key:'value', googol}, [small]: 'small'}
-			expect('string').to.include('rin').that.has.lengthOf(6)
-			expect(obj).to.deep.include({c: {key: 'value', googol}})
-			expect(obj).to.include({c: obj.c})
+		it('#include should verifies if the value is a subset of the object', function () {
+			expect('string', 'subset').to.include('rin').that.has.lengthOf(6)
+			expect(obj, 'subset').to.deep.include({c: {key: 'value', googol}})
+			expect(obj).to.include({c: obj.c}, 'it may be subset')
 			expect(list).to.include('str')
 			expect({a:1, b:2, c:3}).to.be.an('object').that.includes({a:1, c:3}, 'it verifies a piece of an object')
 			Object.prototype.bbb = 2021	// eslint-disable-line no-extend-native
+			expect([1,2,3]).to.own.not.include({bbb: 2021})
 			expect(obj).to.deep.include({bbb: 2021})
-			expect(obj).to.not.deep.own.include({bbb: 2021})
-			expect(obj).to.not.include(obj.toString)
+			expect(obj, 'excluding inherited properties').to.not.deep.own.include({bbb: 2021})
+			expect(obj).to.include(obj.toString)
 			expect(obj).to.nested.deep.include({'b[0]': {a:'b'}})
 			expect(obj).to.not.include({d: 'anyvalue'})	// VERY DANGEROUS: use expect(obj).to.not.have.any.keys('d'), instead
 			expect(obj, 'error happened because there is no that value').to.not.include({b: 'small'})
 			// `include` can be used as a language chain to `keys` and `member`
 			expect(obj).to.include.any.keys('a', 'k')
 			expect(list).to.include.members([1,2,3])
+
+			delete Object.prototype.bbb
 		})
 
-		it('#members should warrants that a array has the same values as expected -- non-ordened', function () {
+		it('#members should warrants that a array has the same values as expected', function () {
 			// expect(small).to.be.an('array').that.have.deep.members({a:'b'})
 			expect([1,2,3,4]).to.have.members([4,2,3,1])
 			expect([1,2,3,4,5]).to.not.have.members([1,3,5])
 			expect([1,2,3]).to.have.ordered.members([1,2,3])
+			expect(['dan', 123, {k:'valo'}]).to.have.deep.ordered.members(['dan', 123, {k:'valo'}])
+			expect(['dan', 123, {k:'valo'}]).to.have.not.ordered.deep.members([123, 'dan', {k:'valo'}])
 
 			// include verifies as a super set
 			expect([1,2,3,4]).to.include.members([2,1])
@@ -97,6 +109,7 @@ describe('Expect', function () {
 			expect(new Map([['a',1], ['b',2]])).to.have.any.key('b')
 
 			// `.not` IS BETTER WITH `.any`
+			expect({a:1,b:2,c:3}, '`a` is in the obj').to.not.have.keys('k','a','key')
 			expect({a:1,b:2,c:3}).to.not.have.any.keys('k','aa','key')
 
 			expect({a:1,b:2}).to.include.all.keys('a','b')
@@ -155,7 +168,19 @@ describe('Expect', function () {
 		it('`.ordered` forces the `.members` to requires in the same order', function () {
 			const obj1 = ['a',1,small,3,2,1]
 			expect(obj1).to.have.ordered.members(['a',1,small,3,2,1]).but.not.have.ordered.members([1,3,2,1])
-			// expect(obj1).to.include.ordered.members([3,2,1])
+			expect(obj1, '`include` verifies the whole obj').to.include.ordered.members(['a',1,small,3,2,1])
+		})
+
+		it('`.any` should verifies at least one of the targets keys', function () {
+			const obj1 = ['a',1,small,3,2,1]
+			expect(obj1).to.have.any.keys('1', 'a', '128')
+			expect(obj).to.have.any.keys('a', 'c', 'g')
+		})
+
+		it('`.all` should verifies all of the given keys', function () {
+			const obj1 = ['a',1,small,3,2,1]
+			expect(obj1).to.have.all.keys('0', '1', '2', '3', '4', '5')
+			expect(obj1).to.have.all.members(['a', 1, small, 3,2,1])
 		})
 	})
 })
