@@ -52,10 +52,7 @@ class Little {
 	 * @returns Buffer
 	 */
 	_open (flag = 'r') {
-		if (flag === 'r')
-			return fs.readFileSync(this.dbpath)
-		else
-			return fs.createWriteStream(this.dbpath)
+		return flag === 'r' ? fs.readFileSync(this.dbpath) : fs.createWriteStream(this.dbpath)
 	}
 
 	/**
@@ -94,7 +91,7 @@ class Little {
 	_createFile () {
 		return fs.createWriteStream(this.dbpath)
 	}
-	
+
 	/**
 	 * Verifies if there is any database in the `DBVALUE`
 	 * 
@@ -104,7 +101,7 @@ class Little {
 	_isThereDbs () {
 		return !!Object.keys(this.DBVALUE).length
 	}
-	
+
 	/**
 	 * Verifies if database `db` exists in `DBVALUE`
 	 * 
@@ -135,8 +132,7 @@ class Little {
 	 * @returns list
 	 */
 	_getDBs () {
-		if (!this._isThereDbs()) return []
-		else return Object.keys(this.DBVALUE)
+		return this._isThereDbs() ? Object.keys(this.DBVALUE) : []
 	}
 
 	/**
@@ -146,8 +142,7 @@ class Little {
 	 * @returns string
 	 */
 	_getCollections () {
-		if (!this._isThereCollections()) return []
-		return Object.keys(this.DBVALUE[this.db])
+		return this._isThereCollections() ? Object.keys(this.DBVALUE[this.db]) : []
 	}
 
 	/**
@@ -156,13 +151,13 @@ class Little {
 	 * @param {boolean} ret (default: false) If false, the databases will be printeds. If true, the databases will be returned as string with `\n` among them.
 	 * @returns string (ret=true)
 	 */
-	show_dbs (ret=false) {
+	show_dbs (ret = false) {
 		let dbs = this._getDBs()
 
 		// returns or prints
 		if (!dbs.length) return ret ? '' : console.log('')
 
-		dbs = dbs.reduce((prev, curr) => prev + '\n' + curr)
+		dbs = dbs.reduce((prev, curr) => `${prev}\n${curr}`)
 
 		return ret ? dbs : console.log(dbs)
 	}
@@ -205,7 +200,7 @@ class Little {
 		if (name === undefined || name === null || name === '') return false
 		return !!/^[a-zA-Z][\w._]*$/.exec(name)
 	}
-	
+
 	/**
 	 * Changes the default database that you are manipulating. It the database does not exists, then it will be created when one document will be inserted in its new collection, that will be created, too.
 	 * 

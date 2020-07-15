@@ -38,6 +38,7 @@
 		"no-case-declarations": "warn",
 		"no-negated-condition": "warn",
 		"no-duplicate-imports": "warn", // but I actually do not use ES06
+		"prefer-destructuring": "warn",
 		"rest-spread-spacing": "warn",
 		"prefer-rest-params": "warn",
 		"default-param-last": "warn",
@@ -82,6 +83,7 @@
 		"no-unneeded-ternary": "error",
 		"symbol-description": "error",
 		"no-useless-rename": "error",
+		"no-param-reassign": "error",
 		"no-nested-ternary": "error",
 		"no-extend-native": "error",
 		"object-shorthand": "error",

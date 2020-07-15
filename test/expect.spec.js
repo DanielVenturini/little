@@ -97,7 +97,7 @@ describe('Expect', function () {
 			expect(new Map([['a',1], ['b',2]])).to.have.any.key('b')
 
 			// `.not` IS BETTER WITH `.any`
-			expect({a:1,b:2,c:3}).to.not.have.any.keys('k','a','key')
+			expect({a:1,b:2,c:3}).to.not.have.any.keys('k','aa','key')
 
 			expect({a:1,b:2}).to.include.all.keys('a','b')
 		})
