@@ -652,5 +652,23 @@ describe('Assert', function () {
 			assert.notSameDeepMembers([1,2,{a: {b: [1,2]}}], [{a: {b: [1,2,3]}},1,2], '3 is not in the first array.array')
 			assert.notSameDeepMembers([1,2,{a: {b: [3,2,1]}}], [{a: {b: [1,2,3]}},1,2], '3 is not in the first array.array')
 		})
+
+		it('`.sameOrderedMembers` should verifies if two object has the same members in the same order', function () {
+			assert.sameOrderedMembers([1,2,'three', 3], [1,2,'three', 3], '3 is not in the first array')
+			// assert.sameOrderedMembers(new Map([[1, 'one'], [2, 'two'], [3, 'three']]), [[1, 'one'],[2, 'two'],[3, 'three']])
+		})
+
+		it('`.notSameOrderedMembers` should verifies if the members is not in the same order', function () {
+			// the same examples from sameMembers
+			assert.notSameOrderedMembers([1,2,3], [3,2,1])
+			assert.notSameOrderedMembers(['k1', 1, 'k2', 2], ['k1', 'k2', 2, 1])
+		})
+
+		it('`.sameDeepOrderedMembers` should verifies deeply if the members are the same in the same order', function () {
+			assert.sameDeepOrderedMembers([1,2,{a: 12},'str'], [1,2,{a:12},'str',1])
+			assert.sameDeepOrderedMembers([{a:1},{b:2},{c:3}], [{a:1},{b:2},{c:3}])
+		})
+
+		// assert.sameDeepOrderedMembers([1,2,{a: 12},'str'], [1,2,{a:12},'str',1]) try it in the includes
 	})
 })
