@@ -1,4 +1,6 @@
-const {expect, assert} = require('chai')
+/* eslint-disable max-classes-per-file */
+
+const {expect, assert, AssertionError, Assertion} = require('chai')
 const googol = 10 ** 100
 const googolplex = 10 ** googol
 
@@ -89,7 +91,8 @@ describe('Expect', function () {
 
 		it('#members should warrants that a array has the same values as expected', function () {
 			// expect(small).to.be.an('array').that.have.deep.members({a:'b'})
-			expect([1,2,3,4]).to.have.members([4,2,3,1])
+			// default, all arrays must be the same length
+			expect([1,2,3,4], 'default, order does not matter').to.have.members([4,2,3,1])
 			expect([1,2,3,4,5]).to.not.have.members([1,3,5])
 			expect([1,2,3]).to.have.ordered.members([1,2,3])
 			expect(['dan', 123, {k:'valo'}]).to.have.deep.ordered.members(['dan', 123, {k:'valo'}])
@@ -155,12 +158,114 @@ describe('Expect', function () {
 		})
 
 		it('`.property` should verify if an object has a property and its value', function () {
-			Object.prototype.a = {k: 'valo'}	// eslint-disable-line no-extend-native
+			// OVERLOAD
+			Object.prototype.a = [{k: 'valo'}]	// eslint-disable-line no-extend-native
 			expect({}).to.have.property('toString')
 			expect({a: 12}).to.have.property('a', 12)
 			expect({a: {b: [1,2,3]}}).to.have.deep.property('a', {b: [1,2,3]})
-			expect({}, 'it also verifies inherited property').to.have.deep.property('a', {k: 'valo'})
+			expect({}, 'it also verifies inherited property').to.have.deep.property('a', [{k: 'valo'}]).that.not.have.own.property('a')
+			expect({}).to.have.nested.property('a[0].k', 'valo')
+			expect({}, 'it overloads the value').to.have.property('a').that.have.lengthOf.at.least(0, 'the verification is in the `a` mapping')
 			delete Object.prototype.a
+			// .ownProperty and .haveOwnProperty can be used interchangeably with .own.property
+		})
+
+		it('`.ownPropertyDescriptor` should verify a property descriptor', function () {
+			// OVERLOAD
+			const obj = {a: 1, unmuted: '127'}
+			Object.setPrototypeOf(obj.a, {
+				configurable: true,
+				enumerable: true,
+				writable: true,
+				value: 1
+			})
+			expect(obj).to.have.ownPropertyDescriptor('a').that.is.an('object').that.have.property('configurable', true)
+			expect(obj).to.have.ownPropertyDescriptor('a', {
+				configurable: true,
+				enumerable: true,
+				writable: true,
+				value: 1
+			})
+		})
+
+		it('`.lengthOf` should verify the `length` or `size` from one obj', function () {
+			expect([1,2,3,4]).to.have.lengthOf(4)
+			expect('daniel').to.have.lengthOf(6)
+
+			// as a language chain
+			expect([1,2,3,4]).to.have.lengthOf.above(3)
+			expect([1,2,3,4]).to.have.lengthOf.below(6)
+			expect([1,2,3,4]).to.have.lengthOf.at.least(2)
+			expect([1,2,3,4]).to.have.lengthOf.most(4)
+			expect([1,2,3,4]).to.have.lengthOf.within(3, 6)
+		})
+
+		it('`.match` should match with a pattern', function () {
+			expect('123kvalo._32').to.match(/kvalo[._\d]+/)
+			expect('foobar').to.match(/^foo/)
+			expect('foo').to.not.match(/\dbar/)
+		})
+
+		it('`.string` should verify if a string contains a substring', function () {
+			expect('daniel').to.have.string('dan')
+			expect('daniel', 'it works as `.string`').to.include('dan')
+			expect('brazil').to.not.have.string('brasil')
+		})
+
+		it('`.throw` should verify if a function throw an error and its message', function () {
+			// OVERLOAD
+			class MyUnexpectedError extends AssertionError {}
+			const msg = 'An unexpected and beautiful error'
+			const fn = function () {throw new MyUnexpectedError(msg)}
+
+			expect(fn, 'expect to just throw').to.throw()
+			expect(fn, 'expect to throw with that msg').to.throw(msg)
+			expect(fn, 'expect the msg match').to.throw(/error/)
+			expect(fn, 'expect to throw a specify error instance').to.throw(MyUnexpectedError)
+			expect(fn).to.throw(AssertionError)
+			expect(fn).to.throws(msg, AssertionError)
+			expect(fn, 'overload').to.throw(MyUnexpectedError).that.is.instanceOf(AssertionError)
+		})
+
+		it('`.respondTo` should verify if the object has an itself or an inherited method', function () {
+			class City {
+				population () {return 1e9}
+				places () {return ['park', 'gas station', 'grocery store']}
+			}
+
+			const camou = new City()
+			expect(camou).to.respondTo('population')
+			expect(camou).to.respondTo('places')
+			expect(camou).to.respondTo('toString')
+			// expect(camou, 'i have no ideia what is happening here').itself.to.respondTo('population').but.not.respondTo('toString')
+		})
+
+		it('`.satisfy` should invoke a given `matcher` with the target being passed as the first argument and expect a true', function () {
+			expect(123).to.satisfy(function (number) {return number > 120})
+			expect({a: {b: [1,2,3]}}).to.satisfy(function (target) {return target.a.b[0]})
+		})
+
+		it('`closeTo` should verify if a number is within a +/- delta range', function () {
+			expect(1.04).is.closeTo(1, 0.5)
+			expect(1.91).is.closeTo(2, 0.1)
+			expect(1.9, 'the delta is not inclusive').is.not.closeTo(2, 0.1)
+		})
+
+		it('`.oneOf` should verify if the number is in the list', function () {
+			expect(12).to.be.oneOf([1,2,3,13,12])
+		})
+
+		it('`.change` should verify if the function change one property', function () {
+			const obj = {a: 12, b: 'str'}
+			const plus = function () { obj.a += 2; return obj.a }
+			const getA = function () { return obj.a }
+
+			expect(plus, 'default behavior').to.change(obj, 'a')
+			// NOW, VERIFIES IF THE getA RETURNS A DIFFERENT VALUE AFTER plus TO BE INVOKED
+			// getA returns `12`; then, plus returns 14; for the last, getA returns `14`
+			expect(getA).to.change(plus)
+			expect(getA).to.change(() => 2)
+
 		})
 	})
 
@@ -231,6 +336,13 @@ describe('Expect', function () {
 			expect(obj1).to.have.all.members(['a', 1, small, 3,2,1])
 		})
 
+		it('`.itself` should force the `.respondTo` verify a non-prototype function', function () {
+			class Cat {}
+			Cat.prototype.meow = function () {return 'au'}
+			Cat.hiss = function () {return 'hiss'}
+
+			expect(Cat).itself.to.respondTo('hiss').but.not.respondTo('meow')
+		})
 	})
 
 	describe('useful', function () {

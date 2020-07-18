@@ -10,11 +10,6 @@ describe('Assert', function () {
 			const second = first + 2
 			assert(first !== second, `${first} should be different from ${second}`)
 		})
-
-		it('`.fail` should  throws and `.throw` should catch it', function () {
-			const message = 'It should throws a failure'
-			assert.throw(function () {throw new Error(message)}, message)
-		})
 	})
 
 	describe('#equal', function () {
@@ -331,11 +326,17 @@ describe('Assert', function () {
 			assert.closeTo(1.028, 1, 0.03)
 		})
 
-		it('`.approximately` should verifies if the number is approximately from other by a range value', function () {
+		it('`.approximately` should verify if the number is approximately from other by a range value', function () {
 			// THE SAME VALUES AS .closeTo
 			assert.approximately(630, 500, 150)
 			assert.approximately(1.028, 1, 0.1)
 			assert.approximately(1.028, 1, 0.03)
+		})
+
+		it('`.oneOf` should verify a non-object and non-array value appears in the list', function () {
+			// it works pretty well to non-object values, that is, to numbers and strings
+			assert.oneOf(1, [2, 1])
+			assert.oneOf('str', [1,2,'str',3])
 		})
 	})
 
@@ -359,7 +360,7 @@ describe('Assert', function () {
 			assert.notTypeOf([1,2,3], 'object')
 		})
 
-		it('`.instanceOf` should verifies the constructor instance', function () {
+		it('`.instanceOf` should verify the constructor instance', function () {
 			class Ventu extends Error {}
 			assert.instanceOf(new Ventu(), Error)
 			assert.instanceOf(new String('brazil'), Object)	// eslint-disable-line
@@ -368,7 +369,7 @@ describe('Assert', function () {
 			assert.instanceOf(new Number(23), Number)	// eslint-disable-line
 		})
 
-		it('`.notInstanceOf` should verifies with others constructor instance', function () {
+		it('`.notInstanceOf` should verify with others constructor instance', function () {
 			assert.notInstanceOf('brazil', String)
 			assert.notInstanceOf('brazil', Object)
 			assert.notInstanceOf(12, Number)
@@ -376,7 +377,7 @@ describe('Assert', function () {
 			assert.notInstanceOf(true, Boolean)
 		})
 
-		it('`.include` should verifies the values inside an object', function () {
+		it('`.include` should verify the values inside an object', function () {
 			// it is different from `.property` because it works with string and list
 			const l = [1,2,3, {a: 12}]
 			const str = 'brazil'
@@ -387,7 +388,7 @@ describe('Assert', function () {
 			assert.include(obj, {toString: obj.toString})
 		})
 
-		it('`.notInclude` should verifies if the values are not in the object', function () {
+		it('`.notInclude` should verify if the values are not in the object', function () {
 			const l = [1,2,3, {a: 12}]
 			const str = 'brazil'
 			const obj = {prop1: 'val1', prop2: 'val2', l: l[3]}
@@ -398,60 +399,60 @@ describe('Assert', function () {
 			assert.notInclude(obj, {l: {a: 12}})
 		})
 
-		it('`.deepInclude` should verifies deeply the values inside an object', function () {
+		it('`.deepInclude` should verify deeply the values inside an object', function () {
 			const l = [1,2,3, {b: 2}]
 			const obj = {prop1: 'val1', prop2: 'val2'}
 			assert.deepInclude(l, {b: 2})
 			assert.deepInclude(obj, {prop1: 'val1'})
 		})
 
-		it('`.notDeepInclude` should verifies if the values are not in the object', function () {
+		it('`.notDeepInclude` should verify if the values are not in the object', function () {
 			const l = [1,2,3, {b: 2}]
 			const obj = {prop1: 'val1', prop2: 'val2', l: l[3]}
 			assert.notDeepInclude(l, [2, {b: 2}])
 			assert.notDeepInclude(obj, {l: {b: 12}})
 		})
 
-		it('`.nestedInclude` should verifies the nested property of an object', function () {
+		it('`.nestedInclude` should verify the nested property of an object', function () {
 			// properties with `.` or `[]` can be escaped using double backslashes `\\`
 			const obj = {countries: {name: 'brazil', population: 1024}, '.bin': {mocha: 'mocha', '[nyc': '.nyc'}}
 			assert.nestedInclude(obj, {'countries.name': 'brazil'})
 			assert.nestedInclude(obj, {'\\.bin.\\[nyc': '.nyc'})
 		})
 
-		it('`.notNestedInclude` should verifies nested if the values are not in the object', function () {
+		it('`.notNestedInclude` should verify nested if the values are not in the object', function () {
 			const obj = {c: {'.bin': {false: [1,2,3], true: [1,2,3], 'back]': 12}}}
 			assert.notNestedInclude(obj, {'c.\\.bin.back\\]': 122})
 		})
 
-		it('`.deepNestedInclude` should verifies nested deeply if the values are on object', function () {
+		it('`.deepNestedInclude` should verify nested deeply if the values are on object', function () {
 			const obj = {c: {'.bin': {false: [1,2,3], true: [1,2,3], 'back]': {a: 12}}}}
 			assert.deepNestedInclude(obj, {'c.\\.bin.false': [1,2,3]})
 			assert.deepNestedInclude(obj, {'c.\\.bin.back\\]': {a: 12}})
 		})
 
-		it('`.notDeepNestedInclude` should verifies nested deeply if the values are not in the object', function () {
+		it('`.notDeepNestedInclude` should verify nested deeply if the values are not in the object', function () {
 			const obj = {c: {'.bin': {false: [1,2,3], true: [1,2,3], 'back]': {a: 12}}}}
 			assert.notDeepNestedInclude(obj, {'c.\\.bin.back\\]': {a: 13}})
 		})
 
-		it('`.ownInclude` should verifies values in object but ignores inherited', function () {
+		it('`.ownInclude` should verify values in object but ignores inherited', function () {
 			const obj = {c: {'.bin': {false: [1,2,3], true: 123, 'back]': {a: 12}}}}
 			assert.ownInclude(obj.c['.bin'], {true: 123})
 		})
 
-		it('`.notOwnInclude` should verifies values that are not in an object or is inherited', function () {
+		it('`.notOwnInclude` should verify values that are not in an object or is inherited', function () {
 			const obj = {c: {'.bin': {false: [1,2,3], true: 123, 'back]': {a: 12}}}}
 			assert.notOwnInclude(obj, {toString: obj.toString})	// obj contains `toString`, but it is inherited
 			assert.notOwnInclude(obj, {c: {'.bin': {true: 123}}})	// keys `false` and `back]` are missing, thus are not own included
 		})
 
-		it('`.deepOwnInclude` should verifies deeply the values that are in object', function () {
+		it('`.deepOwnInclude` should verify deeply the values that are in object', function () {
 			const obj = {c: {'.bin': {false: [1,2,3], true: 123, 'back]': {a: 12}}}}
 			assert.deepOwnInclude(obj.c, {'.bin': {false: [1,2,3], true:123, 'back]': {a: 12}}})
 		})
 
-		it('`.notDeepOwnInclude` should verifies deeply the properties that are not in an object', function () {
+		it('`.notDeepOwnInclude` should verify deeply the properties that are not in an object', function () {
 			const obj = {c: {'.bin': {false: [1,2,3], true: 123, 'back]': {a: 12}}}}
 			assert.notDeepOwnInclude(obj.c['.bin'], {false: [1,2,3,4]})
 		})
@@ -466,7 +467,7 @@ describe('Assert', function () {
 			assert.notMatch('12daniel_ventu.rni', /^[a-zA-Z][\w._]*$/)
 		})
 
-		it('`.property` should verifies a direct or inherited property', function () {
+		it('`.property` should verify a direct or inherited property', function () {
 			// it is different from `.includes` because it just works with properties
 			const obj = {tea: {chai: true}}
 			assert.property(obj, 'tea')
@@ -474,69 +475,69 @@ describe('Assert', function () {
 			assert.include(obj, {toString: obj.toString})	// the same, i think
 		})
 
-		it('`.notProperty` should verifies if a property is not in the obj', function () {
+		it('`.notProperty` should verify if a property is not in the obj', function () {
 			const obj = {tea: {chai: true}}
 			const l = [1,2,3, 'obj']
 			assert.notProperty(obj, 'brazil')
 			assert.notProperty(l, 'obj')	// `.includes` works with list
 		})
 
-		it('`.propertyVal` should verifies the property values', function () {
+		it('`.propertyVal` should verify the property values', function () {
 			const obj = {tea: {chai: true}, str: 'str', n: 123}
 			assert.propertyVal(obj, 'str', 'str')
 			assert.propertyVal(obj, 'n', 123)
 		})
 
-		it('`.notPropertyVal` should verifies if the value of a property is not a specified value', function () {
+		it('`.notPropertyVal` should verify if the value of a property is not a specified value', function () {
 			const obj = {tea: {chai: true}, str: 'str', n: 123}
 			assert.notPropertyVal(obj.tea, 'chai', false)
 			assert.notPropertyVal(obj, 'n', undefined)
 		})
 
-		it('`.deepPropertyVal` should verifies deeply the property values', function () {
+		it('`.deepPropertyVal` should verify deeply the property values', function () {
 			const obj = {tea: {chai: true}, str: 'str', n: 123}
 			assert.deepPropertyVal(obj, 'tea', {chai: true})
 		})
 
-		it('`.noDeepPropertyVal` should verifies deeply if the value of a properfy is not a specified value', function () {
+		it('`.noDeepPropertyVal` should verify deeply if the value of a properfy is not a specified value', function () {
 			const obj = {tea: {chai: true}, str: 'str', n: 123}
 			assert.notDeepPropertyVal(obj, 'tea', {chai: false})
 		})
 
-		it('`.nestedProperty` should verifies nested if an object has a property', function () {
+		it('`.nestedProperty` should verify nested if an object has a property', function () {
 			const obj = {tea: {chai: true}, str: 'str', n: 123}
 			assert.nestedProperty(obj, 'tea.chai')
 			assert.nestedProperty(obj, 'n')
 		})
 
-		it('`.notNestedProperty` should verifies nested if an object has no a specified property', function () {
+		it('`.notNestedProperty` should verify nested if an object has no a specified property', function () {
 			assert.notNestedProperty({a: {b: {c: {d: 1}}}}, 'a.b.c.d.e')
 		})
 
-		it('`.nestedPropertyVal` should verifies nested if an object has a specified property', function () {
+		it('`.nestedPropertyVal` should verify nested if an object has a specified property', function () {
 			const obj = {tea: {chai: true}, str: 'str', n: 123}
 			assert.nestedPropertyVal({a: {b: {c: {d: 1}}}}, 'a.b.c.d', 1)
 			assert.nestedPropertyVal(obj, 'tea.chai', true)
 			assert.nestedPropertyVal(obj, 'str[0]', 's')
 		})
 
-		it('`.notNestedPropertyVal` should verifies nested if a property has no a specified val', function () {
+		it('`.notNestedPropertyVal` should verify nested if a property has no a specified val', function () {
 			const obj = {tea: {chai: true}, str: 'str', n: 123}
 			assert.notNestedPropertyVal(obj, 'str[0]', 'g')
 			assert.notNestedPropertyVal(obj, 'tea.chai', false)
 		})
 
-		it('`.deepNestedPropertyVal` should verifies deeply nested if a property has a val', function () {
+		it('`.deepNestedPropertyVal` should verify deeply nested if a property has a val', function () {
 			const obj = {tea: {chai: true}, str: 'str', n: 123}
 			assert.deepNestedPropertyVal(obj, 'tea', {chai: true})
 		})
 
-		it('`.notDeepNestedPropertyVal` should verifies if a property has no a specified value', function () {
+		it('`.notDeepNestedPropertyVal` should verify if a property has no a specified value', function () {
 			const obj = {tea: {chai: true}, str: 'str', n: 123}
 			assert.notDeepNestedPropertyVal(obj, 'n', '123')
 		})
 
-		it('`.lengthOf` should verifies the length of an object', function () {
+		it('`.lengthOf` should verify the length of an object', function () {
 			const obj = {a: 10, b:'k'}
 			obj.length = 10
 			assert.lengthOf(obj, 10, '.lengthOf verifies the `length` property')
@@ -546,19 +547,19 @@ describe('Assert', function () {
 			assert.lengthOf(new Set([1,2,3]), 3)
 		})
 
-		it('`.hasAnyKeys` should verifies if the obj has some of those keys', function () {
+		it('`.hasAnyKeys` should verify if the obj has some of those keys', function () {
 			assert.hasAnyKeys({a: 10, b:'k'}, ['a', 'k', 'j'])
 			assert.hasAnyKeys(new Map([['a', 'value'], ['b', 12]]), ['a', 'j'])
 		})
 
-		it('`.hasAllKeys` should verifies all keys in the object', function () {
+		it('`.hasAllKeys` should verify all keys in the object', function () {
 			const obj = {obj: 'key', map: 12, three: 3}
 			assert.hasAllKeys(obj, ['obj', 'map', 'three'])
 			// THE NEXT DOES NOT WORK, BUT IN `CONTAINS`, IT DOES
 			// assert.hasAllKeys(obj, ['obj', 'map'], 'obj has more than those keys')
 		})
 
-		it('`.hasAllDeepKeys` should verifies if object has all keys deeply', function () {
+		it('`.hasAllDeepKeys` should verify if object has all keys deeply', function () {
 			const obj = {obj: 'key', map: 12, three: 3}
 			const obj2 = {[obj]: 'key', day: 7}
 
@@ -566,21 +567,21 @@ describe('Assert', function () {
 			assert.hasAllDeepKeys(obj2, ['day', obj])
 		})
 
-		it('`.containsAllKeys` should verifies if the object has AT LEAST all keys provided', function () {
+		it('`.containsAllKeys` should verify if the object has AT LEAST all keys provided', function () {
 			// a single match key will validated the test
 			const obj = {obj: 'key', map: 12, three: 3}
 			assert.containsAllKeys(obj, ['obj', 'map', 'three'])
 			assert.containsAllKeys(obj, ['obj', 'map'], 'obj should has at least all these keys')
 		})
 
-		it('`.containsAllDeepKeys` should verifies that object contains all of the keys deeply provided', function () {
+		it('`.containsAllDeepKeys` should verify that object contains all of the keys deeply provided', function () {
 			const obj = {obj: 'key', map: 12, three: 3}
 			assert.containsAllDeepKeys(obj, ['obj', 'map', 'three'])
 			assert.containsAllDeepKeys(obj, ['obj', 'map'], 'obj contains at least all keys provided, but it may contains more')
 			assert.containsAllDeepKeys(new Map([[{one: 'one'}, 'valueOne'], [1,2]]), {one:'one'})
 		})
 
-		it('`.doesNotHaveAnyKeys` should verifies if object has NONE of those keys', function () {
+		it('`.doesNotHaveAnyKeys` should verify if object has NONE of those keys', function () {
 			// a single matched key will fail the test
 			const obj = {obj: 'key', map: 12, three: 3}
 			assert.doesNotHaveAnyKeys(obj, ['object', 'mapped', 'two'], 'at least `two` is not in the `obj`')
@@ -588,13 +589,13 @@ describe('Assert', function () {
 			assert.doesNotHaveAnyKeys([0,1,2,3,4], ['33', 'kvalue', 'jvalue', 'money'])
 		})
 
-		it('`.doesNotHaveAnyDeepKeys` should verifies deeply if the object has none of the keys provider', function () {
+		it('`.doesNotHaveAnyDeepKeys` should verify deeply if the object has none of the keys provider', function () {
 			const obj = {obj: 'key', map: 12, three: 3}
 			assert.doesNotHaveAnyDeepKeys(obj, ['objj', 'maped', 'two'])
 			assert.doesNotHaveAnyDeepKeys(new Map([[{a:'b'}, 'kvalo']]), {a:'a'})
 		})
 
-		it('`.doesNotHaveAllKeys` should verifies if object does not have at least one of those keys', function () {
+		it('`.doesNotHaveAllKeys` should verify if object does not have at least one of those keys', function () {
 			// a single missing or unbound key will pass the test
 			const obj = {obj: 'key', map: 12, three: 3}
 			assert.doesNotHaveAllKeys(obj, {obj: 'key', map: 12, three: 3, two: 3}, 'at least `two` is not in the obj')
@@ -603,7 +604,7 @@ describe('Assert', function () {
 			assert.doesNotHaveAllKeys([1,2,3,4], ['0', '1', '2'], 'missing key `3` is in the obj')
 		})
 
-		it('`.doesNotHaveAllDeepKeys` should verifies if the object has no at least one of the keys', function () {
+		it('`.doesNotHaveAllDeepKeys` should verify if the object has no at least one of the keys', function () {
 			const obj = {obj: 'key', map: 12, three: 3}
 			assert.doesNotHaveAllDeepKeys(obj, ['obj', 'map', 'two'])
 			assert.doesNotHaveAllDeepKeys(new Map([[{a: '1'}, 12]]), {a: 1})
@@ -621,7 +622,7 @@ describe('Assert', function () {
 			assert.throws(fn, Error) // The error should be an instance of `Error`
 		})
 
-		it('`.doesNotThrow` should verifies if the callback does not throws any error', function () {
+		it('`.doesNotThrow` should verify if the callback does not throws any error', function () {
 			class MyUnexpectedError extends Error {}
 			const msg = 'There is no one waiting for this'
 			const fn = () => {throw new MyUnexpectedError(msg)}
@@ -632,43 +633,154 @@ describe('Assert', function () {
 			assert.doesNotThrow(fn, MyUnexpectedError2, 'if throws, should not be an instance of MyUnexpectedError2')
 		})
 
-		it('`.sameMembers` should verifies if both arrays have the same members', function () {
+		it('`.sameMembers` should verify if both arrays have the same members', function () {
 			assert.sameMembers([1,2,3], [3,2,1], 'it works in any order')
 			assert.sameMembers(['k1', 1, 'k2', 2], ['k1', 'k2', 2, 1])
 		})
 
-		it('`.notSameMembers` should verifies if arrays have at least one different value', function () {
+		it('`.notSameMembers` should verify if arrays have at least one different value', function () {
 			assert.notSameMembers([1,2,3], [1,3,2,4], '4 is not in the first array')
 			assert.notSameMembers([1,2,3,'str'], [1,3,2,4])
 		})
 
-		it('`.sameDeepMembers` should verifies deeply if both arrays have the same values', function () {
+		it('`.sameDeepMembers` should verify deeply if both arrays have the same values', function () {
 			assert.sameDeepMembers([1,2,{a: 12},'str'], [2,{a:12},'str',1])
 			assert.sameDeepMembers([{a:1},{b:2},{c:3}], [{b:2},{a:1},{c:3}])
 		})
 
-		it('`.notSameDeepMembers` should verifies deeply at least one value different in arrays', function () {
+		it('`.notSameDeepMembers` should verify deeply at least one value different in arrays', function () {
 			assert.notSameDeepMembers([1,2,{a: {b: [1,2]}}], [{a: {b: [1,2]}},1,3], '3 is not in the first array')
 			assert.notSameDeepMembers([1,2,{a: {b: [1,2]}}], [{a: {b: [1,2,3]}},1,2], '3 is not in the first array.array')
 			assert.notSameDeepMembers([1,2,{a: {b: [3,2,1]}}], [{a: {b: [1,2,3]}},1,2], '3 is not in the first array.array')
 		})
 
-		it('`.sameOrderedMembers` should verifies if two object has the same members in the same order', function () {
+		it('`.sameOrderedMembers` should verify if two object has the same members in the same order', function () {
 			assert.sameOrderedMembers([1,2,'three', 3], [1,2,'three', 3], '3 is not in the first array')
 			// assert.sameOrderedMembers(new Map([[1, 'one'], [2, 'two'], [3, 'three']]), [[1, 'one'],[2, 'two'],[3, 'three']])
 		})
 
-		it('`.notSameOrderedMembers` should verifies if the members is not in the same order', function () {
+		it('`.notSameOrderedMembers` should verify if the members is not in the same order', function () {
 			// the same examples from sameMembers
 			assert.notSameOrderedMembers([1,2,3], [3,2,1])
 			assert.notSameOrderedMembers(['k1', 1, 'k2', 2], ['k1', 'k2', 2, 1])
 		})
 
-		it('`.sameDeepOrderedMembers` should verifies deeply if the members are the same in the same order', function () {
-			assert.sameDeepOrderedMembers([1,2,{a: 12},'str'], [1,2,{a:12},'str',1])
+		it('`.sameDeepOrderedMembers` should verify deeply if the members are the same in the same order', function () {
+			assert.sameDeepOrderedMembers([1,2,{a: 12},'str'], [1,2,{a:12},'str'])
 			assert.sameDeepOrderedMembers([{a:1},{b:2},{c:3}], [{a:1},{b:2},{c:3}])
 		})
 
-		// assert.sameDeepOrderedMembers([1,2,{a: 12},'str'], [1,2,{a:12},'str',1]) try it in the includes
+		it('`.notSameDeepOrderedMembers` should verify if both object have no all members in the same order', function () {
+			assert.notSameDeepOrderedMembers([1,2,{3:4},5],[1,2,{3: 'four'},5])
+		})
+
+		it('`.includeMembers` should verify a superset in any order', function () {
+			// duplicates are ignored
+			assert.includeMembers([1,2,{a: 12},'str'], [1,2,'str',1])
+		})
+
+		it('`.notIncludeMembers` should verify a not superset for all values in any order', function () {
+			assert.notIncludeMembers([1,2,3,{a:12}], [3,{a:12},4,'five'], '3 is in the superset, but the other ones are not')
+			assert.notIncludeMembers([1,2,3], [5,1], '1 is in the superset, but the other ones are not')
+		})
+
+		it('`.includeDeepMembers` should verify deeply a superset in any order', function () {
+			assert.includeDeepMembers([1,2,{a:12}], [{a:12},2])
+			assert.includeDeepMembers([{key:['str',1,2,3]}, {obj: 'map'}], [{obj: 'map'}, {key:['str',1,2,3]}])
+		})
+
+		it('`.notIncludeDeepMembers` should not verify a superset in any order', function () {
+			assert.notIncludeDeepMembers([{a: 12}, 'kvalo', {b:{c: 3}}], [{a: 12}, {b:{c: 'three'}}])
+		})
+
+		it('`.includeOrderedMembers` should verify a superset in the same order begginning with the first element', function () {
+			// THE VERIFICATION STARTS AT THE FIRST ELEMENT
+			assert.includeOrderedMembers([1,2,3,'four'], [1,2,3], 'four is not in the subset, but all other values are in the same order')
+			// assert.includeOrderedMembers([1,'str',3], ['str',3]) // will not work, because 'str' is not the first element in the superset
+		})
+
+		it('`.notIncludeOrderedMembers` should verify a not superset in any order by the first element', function () {
+			assert.notIncludeOrderedMembers([1,2,'str'], [2,'str'], '2 is not the beginning at superset')
+			assert.notIncludeOrderedMembers([1,2,3,'str'], [1,2,'str'])
+			assert.notIncludeOrderedMembers([1,2,3,'str'], [1,3,2])
+		})
+
+		it('`.includeDeepOrderedMembers` should verify deeply an ordered subset', function () {
+			assert.includeDeepOrderedMembers([1,2,{a:'k'},2,3,1], [1,2,{a:'k'}])
+		})
+
+		it('`.notIncludeDeepOrderedMembers` should verify a not subset deeply ordered', function () {
+			assert.notIncludeDeepOrderedMembers([{a:{b: ['one']}}, {b:['one']}], [{a:{b:['one']}}, {b:[1]}])
+		})
+	})
+
+	describe.only('Functions utils', function () {
+		it('`.fail` should throw and `.throw` should catch it', function () {
+			assert.throw(() => assert.fail('errored'), 'errored')
+			const message = 'It should throws a failure'
+			assert.throw(function () {throw new Error(message)}, message)
+		})
+
+		it('`.changes` should verify if a function changes an object property', function () {
+			let obj = {a: 12, b: 'unchangeble'}
+			const fn = () => {obj.b = 'brazil'}
+
+			assert.changes(fn, obj, 'b')
+
+			obj = {b: 'doze'}
+			assert.changes(fn, obj, 'b')
+		})
+
+		it('`.changesBy` should verify if a function changed an object property by a delta', function () {
+			let obj = {a: 12, b: 'unchangeble'}
+			const sub2 = () => {obj.a -= 2}
+
+			assert.changesBy(sub2, obj, 'a', -2)	// delta value
+		})
+
+		it('`.doesNotChange` should verify if a function does not change an object property', function () {
+			let obj = {a: 12, b: 'unchangeble'}
+			const sub2 = () => {obj.a -= 2}
+
+			assert.doesNotChange(sub2, obj, 'b')	// `a` was changed, but `b` not
+		})
+
+		it('`.changesButNotBy` should verify if a function does not change an object property to a specific delta', function () {
+			const obj = {a: 12, b: 'unchangeble', c: 127}
+			const sub2 = () => {obj.a -= 2}
+			const plusAndRet = () => {obj.c += 3; return obj.c + 1}
+
+			// that is, the `obj.a` changed 2 amounts, but not 3 amounts
+			assert.changesButNotBy(sub2, obj, 'a', 3)	// delta value
+			assert.changesButNotBy(plusAndRet, obj, 'c', 4)
+		})
+
+		it('`.increases` should verify if a function increases a numeric property', function () {
+			const obj = {str: 'brazil', b: 127}
+			const plus = () => {obj.b += 2}
+
+			assert.increases(plus, obj, 'b')
+		})
+
+		it('`.increasesBy` should verify if a function increases a numeric value to a delta', function () {
+			const obj = {str: 'brazil', b: 126}
+			const plus = () => {obj.b += 2}
+
+			assert.increasesBy(plus, obj, 'b', 2)
+		})
+
+		it('`.doesNotIncrease` should verify if a function does not increase a value', function () {
+			const obj = {str: 'brazil', b: 126}
+			const plus = () => {obj.str = 'string'; return obj.b + 3}
+
+			assert.doesNotIncrease(plus, obj, 'b')
+		})
+
+		it('`.increasesButNotBy` should verify if the function increases a value, but not to a delta', function () {
+			const obj = {str: 'brazil', b: 126, k: 12}
+			const plus = () => {obj.b += 3}
+
+			assert.increasesButNotBy(plus, obj, 'b', 2)
+		})
 	})
 })
