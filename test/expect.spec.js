@@ -255,18 +255,93 @@ describe('Expect', function () {
 			expect(12).to.be.oneOf([1,2,3,13,12])
 		})
 
-		it('`.change` should verify if the function change one property', function () {
+		it('`.change` should verify if the function changes one property', function () {
 			const obj = {a: 12, b: 'str'}
-			const plus = function () { obj.a += 2; return obj.a }
-			const getA = function () { return obj.a }
+			const change = function () { Math.random() > 0.5 ? obj.a += 2 : obj.a -= 5 }
+			const getA = () => obj.a
 
-			expect(plus, 'default behavior').to.change(obj, 'a')
-			// NOW, VERIFIES IF THE getA RETURNS A DIFFERENT VALUE AFTER plus TO BE INVOKED
-			// getA returns `12`; then, plus returns 14; for the last, getA returns `14`
-			expect(getA).to.change(plus)
-			expect(getA).to.change(() => 2)
+			expect(change, 'default behavior').to.change(obj, 'a')
+			// executes `getA` and save the value
+			// executes `change`
+			// executes `getA`, again, and verifies if the value changed
+			expect(change).to.change(getA)
+			expect(change).to.change(getA)
+			expect(getA).to.not.change(() => 2)	// of course, () => will never return a different value
 
+			// when there is an object and a property in `.change`, it executes `change` twice and verify the `object.property`
+			expect(change).to.change(obj, 'a')
+			this.retries(4)	// `change` function may change to +2 or -5
+			expect(change).to.change(obj, 'a').by(2)
+
+			obj.a = 10
+			const even = () => !(obj.a % 2)
+			const changeToOdd = () => {even() ? obj.a += 1 : obj.a += 2}
+
+			expect(changeToOdd).to.change(even)
 		})
+
+		it('`.increases` should verify if the function increases a numeric value', function () {
+			const obj = {a:12, b:13, c:'brazil'}
+			const plus = function () { obj.a += 12 }
+			const ret = function () { return obj.a }
+
+			// RET returns 12, then PLUS increases to 24, and PLUS returns 24
+			// so, it executes RET, then PLUS, and RET again
+			expect(plus).to.increases(ret)
+			expect(ret).to.not.increases(() => 2)	// of course
+			expect(plus).to.increases(ret).to.by(12)
+
+			// when there is obj and a property in `.increases`, it executes `plus` twice and verify the `object.property`
+			expect(plus).to.increases(obj, 'a')
+		})
+
+		it('`.decreases` should verify if the function decreases a numeric value', function () {
+			const obj = {a:12, b:13, c:'brazil'}
+			const sub = function () { obj.a -= 12 }
+			const ret = function () { return obj.a }
+
+			expect(sub).to.decreases(ret)
+			expect(ret).to.not.decreases(() => 2)	// of course
+			expect(sub).to.decreases(ret).to.by(12)
+
+			expect(sub).to.decreases(obj, 'a')
+		})
+
+		/* eslint-disable no-unused-expressions */
+		it('`.extensible` should verify if the object is extensible', function () {
+			expect({a: 12}).to.be.extensible
+			expect({}).to.be.extensible
+			expect(new Error('an extensible error')).to.be.extensible
+		})
+
+		it('`.sealed` should verify if the object is sealed', function () {
+			const obj = Object.seal({a:12, b:'brazil'})
+			expect(obj)
+			expect(12).to.be.sealed
+			expect(true).to.be.sealed
+			expect(null).to.be.sealed
+		})
+
+		it('`.frozed` should verify if the object is frozed', function () {
+			const obj = Object.freeze({a:12, b:'brazil'})
+			expect(obj)
+			expect(12).to.be.frozen
+			expect(true).to.be.frozen
+			expect(null).to.be.frozen
+		})
+
+		it('`.finite` should verify if the object is finite', function () {
+			expect(12).to.be.finite
+			expect(googol).to.be.finite
+			expect(googolplex).to.not.be.finite
+		})
+
+		it('`.fail` should throw a failuer', function () {
+			const msg = 'my awesome failure'
+			expect(() => expect.fail()).to.throws
+			expect(() => expect.fail(msg)).to.throws
+		})
+		/* eslint-enable no-unused-expressions */
 	})
 
 	describe('operators', function () {
@@ -342,6 +417,23 @@ describe('Expect', function () {
 			Cat.hiss = function () {return 'hiss'}
 
 			expect(Cat).itself.to.respondTo('hiss').but.not.respondTo('meow')
+		})
+
+		it('`.by` should verify to `increase`, `decrease` and `change` a delta value', function () {
+			const obj = {a:12, b:13, c:'brazil'}
+			const increases = function () { obj.a += 12 }
+			const decreases = function () { obj.a -= 12}
+			const changes = function () { Math.round() > 0.5 ? decreases() : increases() }
+
+			const ret = function () { return obj.a }
+
+			expect(changes).to.increases(obj, 'a').to.by(12)
+			expect(decreases).to.decreases(obj, 'a').to.by(12)
+			expect(increases).to.increases(obj, 'a').to.by(12)
+
+			expect(changes).to.change(ret).to.by(12)
+			expect(decreases).to.decreases(ret).to.by(12)
+			expect(increases).to.increases(ret).to.by(12)
 		})
 	})
 
