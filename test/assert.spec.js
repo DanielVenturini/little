@@ -712,9 +712,71 @@ describe('Assert', function () {
 		it('`.notIncludeDeepOrderedMembers` should verify a not subset deeply ordered', function () {
 			assert.notIncludeDeepOrderedMembers([{a:{b: ['one']}}, {b:['one']}], [{a:{b:['one']}}, {b:[1]}])
 		})
+
+		it('`.ifError` should rethrow an error', function () {
+			const msg = 'I am a custom error'
+			const err = new Error(msg)
+			assert.throws(() => {assert.ifError(err)}, Error, msg)
+		})
+
+		it('`.isExtensible` should verify if the object is extensible', function () {
+			const obj = {a: 12, b: 'str'}
+			assert.isExtensible(obj)
+			assert.isExtensible({})
+			assert.isExtensible(new String('brazil'))	// eslint-disable-line no-new-wrappers
+			assert.isExtensible(new Error('brazil has gone well'))
+		})
+
+		it('`.isNotExtensible` should verify if the object is not extensible', function () {
+			const obj = Object.preventExtensions({a: 12, b: 'str'})
+			assert.isNotExtensible(obj)
+			assert.isNotExtensible(1)
+			assert.isNotExtensible(true)
+		})
+
+		it('`.isSealed` should verify if the object is sealable', function () {
+			const obj = Object.seal({a: 12, b: 'str'})
+			assert.isSealed(obj)
+			assert.isSealed(123)
+			assert.isSealed(false)
+		})
+
+		it('`.isNotSealed` should verify if the object is not sealable', function () {
+			const obj = {a: 12, b: 'str'}
+			assert.isNotSealed(obj)
+			assert.isNotSealed({})
+			assert.isNotSealed(new Error('custom error'))
+		})
+
+		it('`.isFrozen` should verify if the object is frozen', function () {
+			const obj = Object.freeze({a:12, b:'str'})
+			assert.isFrozen(obj)
+			assert.isFrozen(123)
+		})
+
+		it('`.isNotFrozen` should verify if the object is frozen', function () {
+			const obj = {a:12, b:'str'}
+			assert.isNotFrozen(obj)
+			assert.isNotFrozen({})
+			assert.isNotFrozen(new Error('An unfrozen error'))
+		})
+
+		it('`.isEmpty` should verify if the object is empty, that is, has no elements', function () {
+			assert.isEmpty({})
+			assert.isEmpty([])
+			assert.isEmpty('')
+			assert.isEmpty(new Map([]))
+		})
+
+		it('`.isNotEmpty` should verify if the object is not empty, that is, has elements', function () {
+			assert.isNotEmpty({a: 12})
+			assert.isNotEmpty([1,2,3,'four'])
+			assert.isNotEmpty('brazil')
+			assert.isNotEmpty(new Map([['place', 'brazil']]))
+		})
 	})
 
-	describe.only('Functions utils', function () {
+	describe('Functions utils', function () {
 		it('`.fail` should throw and `.throw` should catch it', function () {
 			assert.throw(() => assert.fail('errored'), 'errored')
 			const message = 'It should throws a failure'
@@ -781,6 +843,43 @@ describe('Assert', function () {
 			const plus = () => {obj.b += 3}
 
 			assert.increasesButNotBy(plus, obj, 'b', 2)
+		})
+
+		it('`.decreases` should verify if the function decreases a numeric property', function () {
+			const obj = {str: 'brazil', b: 126, k: 12}
+			const dec = () => {obj.b -= 3}
+
+			assert.decreases(dec, obj, 'b')
+		})
+
+		it('`.decreasesBy` should verify if the function decreases a numeric property to a delta', function () {
+			const obj = {str: 'brazil', b: 126, k: 12}
+			const dec = () => {obj.b -= 3}
+
+			assert.decreasesBy(dec, obj, 'b', 3)
+		})
+
+		it('`.doesNotDecrease` should verify if the function does not decrease a numeric property', function () {
+			const obj = {str: 'brazil', b: 126, k: 12}
+			const dec = () => {obj.str += 'other'}
+
+			assert.doesNotDecrease(dec, obj, 'b')
+		})
+
+		it('`.doesNotDecreaseBy` should verify if the function does not decrease a numeric property a certain delta', function () {
+			this.retries(3)
+			const obj = {str: 'brazil', b: 126, k: 12}
+			const dec = () => {Math.random () > 0.9 ? obj.b -= 7 : obj.b += 7}
+
+			assert.doesNotDecrease(dec, obj, 'b', 7)
+		})
+
+		it('`.decreasesButNotBy` should verify if the function decreases a numeric property but not to a certain delta', function () {
+			this.retries(3)
+			const obj = {str: 'brazil', b: 126, k: 12}
+			const dec = () => {Math.random () > 0.95 ? obj.b -= 7 : obj.b -= 6}
+
+			assert.decreasesButNotBy(dec, obj, 'b', 7)
 		})
 	})
 })
